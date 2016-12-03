@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/pref_cat_stat"
+        android:key="pref_cat_stat">
+        <Preference
+            android:key="pref_stat_sum"
+            android:summary="@string/pref_stat_sum" />
+        <CheckBoxPreference
+            android:key="pref_stat_detail"
+            android:title="@string/pref_title_stat_detail"
+            android:summary="@string/pref_stat_detail_sum"
+            android:defaultValue="false" />
+        <CheckBoxPreference
+            android:key="pref_stat_detail_clear"
+            android:title="@string/pref_title_stat_detail_clear"
+            android:summary="@string/pref_stat_clear_sum"
+            android:defaultValue="true"
+            android:dependency="pref_stat_detail" />
+        <EditTextPreference
+            android:key="pref_stat_detail_clear_num"
+            android:title="@string/pref_title_stat_clear_num"
+            android:summary="@string/pref_stat_clear_num_sum"
+            android:defaultValue="7"
+            android:numeric="integer"
+            android:dependency="pref_stat_detail_clear"/>
+        <CheckBoxPreference
+            android:key="pref_stat_hour"
+            android:title="@string/pref_title_stat_hour"
+            android:summary="@string/pref_stat_hour_sum"
+            android:defaultValue="false" />
+        <ListPreference
+            android:key="pref_stat_hour_min"
+            android:title="@string/pref_title_stat_hour_min"
+            android:summary="@string/pref_stat_hour_min_sum"
+            android:entries="@array/interval"
+            android:entryValues="@array/interval_min"
+            android:defaultValue="30"
+            android:dependency="pref_stat_hour"/>
+        <CheckBoxPreference
+            android:key="pref_stat_hour_clear"
+            android:title="@string/pref_title_stat_hour_clear"
+            android:summary="@string/pref_stat_clear_sum"
+            android:defaultValue="true"
+            android:dependency="pref_stat_hour" />
+        <EditTextPreference
+            android:key="pref_stat_hour_clear_num"
+            android:title="@string/pref_title_stat_clear_num"
+            android:summary="@string/pref_stat_clear_num_sum"
+            android:defaultValue="15"
+            android:numeric="integer"
+            android:dependency="pref_stat_hour_clear"/>
+        <CheckBoxPreference
+            android:key="pref_stat_daily"
+            android:title="@string/pref_title_stat_daily"
+            android:summary="@string/pref_stat_daily_sum"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:title="@string/pref_cat_deb"
+        android:key="pref_cat_stat">
+    <CheckBoxPreference
+        android:key="pref_debug"
+        android:title="@string/pref_title_debug"
+        android:summary="@string/pref_sum_debug"
+        android:defaultValue="false" />
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

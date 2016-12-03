@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="interval">
+        <item>@string/pref_stat_hour_list_1</item>
+        <item>@string/pref_stat_hour_list_2</item>
+        <item>@string/pref_stat_hour_list_3</item>
+    </string-array>
+    <string-array name="interval_min">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
+</resources>

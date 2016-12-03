@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/content_main"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="grmpl.mk.stepandheightcounter.MainActivity" tools:showIn="@layout/activity_main">
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
+        <RelativeLayout
+            android:layout_weight="4"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_marginEnd="40dp">
+
+            <Button
+                android:text="@string/button_pause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/buttonStart"
+                android:layout_marginTop="0dp"
+                android:textAlignment="center"
+                style="@android:style/Widget.Holo.Button"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"/>
+
+            <TextView
+                android:text="@string/no_data"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewError"
+                android:layout_marginTop="16dp"
+                android:layout_below="@+id/buttonStart"
+                android:layout_alignParentStart="true" />
+
+            <TextView
+                android:text="@string/steps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewSteps"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textSize="18sp"
+                android:layout_marginStart="10dp"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/textViewError"
+                android:layout_marginTop="8dp"/>
+
+            <TextView
+                android:text="@string/zero"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewStepO"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:layout_alignBaseline="@+id/textViewSteps"
+                android:layout_alignBottom="@+id/textViewSteps"
+                android:layout_alignParentEnd="true"
+                android:textSize="18sp" />
+
+            <TextView
+                android:text="@string/height_actual"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewHeight"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:layout_marginTop="8dp"
+                android:layout_below="@+id/textViewSteps"
+                android:layout_alignStart="@+id/textViewSteps"
+                android:textSize="18sp" />
+
+            <TextView
+                android:text="@string/height_init1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewHeightO"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:layout_alignBaseline="@+id/textViewHeight"
+                android:layout_alignBottom="@+id/textViewHeight"
+                android:layout_alignParentEnd="true"
+                android:textSize="18sp" />
+
+            <TextView
+                android:text="@string/height_accumulated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewHeightacc"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textSize="18sp"
+                android:layout_below="@id/textViewHeight"
+                android:layout_marginTop="8dp"
+                android:layout_alignStart="@+id/textViewSteps" />
+
+            <TextView
+                android:text="@string/zero_m"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewHeightaccO"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textSize="18sp"
+                android:layout_alignBaseline="@id/textViewHeightacc"
+                android:layout_alignBottom="@+id/textViewHeightacc"
+                android:layout_alignParentEnd="true" />
+
+            <EditText
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:ems="10"
+                android:id="@+id/editTextHeightcal"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                style="@style/Widget.AppCompat.EditText"
+                android:visibility="visible"
+                android:background="@android:drawable/editbox_background"
+                android:selectAllOnFocus="false"
+                android:textSize="18sp"
+                android:hint="@string/height_m"
+                android:maxLines="1"
+                android:layout_alignStart="@+id/textViewSteps"
+                android:layout_below="@id/textViewHeightacc"
+                android:layout_marginTop="15dp"/>
+
+            <Button
+                android:text="@string/button_calibrate_height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/buttonCalibrate"
+                style="@android:style/Widget.Holo.Button"
+                android:onClick="calibrateHeight"
+                android:layout_alignBaseline="@id/editTextHeightcal"
+                android:layout_toEndOf="@id/editTextHeightcal"
+                android:layout_marginStart="40dp" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:layout_width="wrap_content">
+
+            <Button
+                android:text="@string/button_reset_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/buttonReset"
+                android:onClick="resetData"
+                style="@android:style/Widget.Holo.Button"
+                android:layout_marginEnd="50dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"/>
+
+            <TextView
+                android:text="@string/text_reset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView"
+                android:textSize="16sp"
+                android:layout_below="@id/buttonReset"
+                android:layout_marginTop="5dp"
+                android:layout_centerHorizontal="true"
+                android:textAlignment="center" />
+
+
+
+        </RelativeLayout>
+    </LinearLayout>
+
+</RelativeLayout>
