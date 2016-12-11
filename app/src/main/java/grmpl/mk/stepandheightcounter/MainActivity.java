@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mStatusText, mHeightText, mStepText, mHeightaccText, mStepDailyText, mHeightDailyText;
     private EditText mCalibrateIn;
     private Button mStartButton;
+    private ProgressBar mStepDailyProgress, mHeightDailyProgress;
     boolean mBounded = false, mRunning = false;
     SensorService mSensService;
     MyReceiver mReceiver = null;
@@ -69,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
         mStartButton = (Button)findViewById(R.id.buttonStart);
         mStepDailyText = (TextView)findViewById(R.id.textViewDailyStepsNum);
         mHeightDailyText = (TextView)findViewById(R.id.textViewDailyHeightNum);
+        mStepDailyProgress = (ProgressBar)findViewById(R.id.progressBarSteps);
+        mHeightDailyProgress = (ProgressBar)findViewById(R.id.progressBarHeight);
 
         mStartButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -269,13 +273,21 @@ public class MainActivity extends AppCompatActivity {
             mHeightaccText.setText(String.format(Locale.getDefault(),"%.1f m",heightacc));
             Float stepstoday = receive.getFloatExtra("Stepstoday",0F);
             mStepDailyText.setText(String.format(Locale.getDefault(),"%.0f",stepstoday));
-            if (stepstoday < Integer.valueOf(
-                    mSettings.getString(mPREF_TARGET_STEPS, "100000"))) mStepDailyText.setTextColor(Color.RED);
+            int dailysteps = Integer.valueOf(mSettings.getString(mPREF_TARGET_STEPS, "100000"));
+            if (stepstoday < dailysteps) {
+                mStepDailyText.setTextColor(Color.RED);
+                mStepDailyProgress.setProgress( (int)(100 * stepstoday) / dailysteps );
+            }
+            //Todo: set progress bar green
             else mStepDailyText.setTextColor(Color.GREEN);
             Float heighttoday = receive.getFloatExtra("Heighttoday",0F);
             mHeightDailyText.setText(String.format(Locale.getDefault(),"%.1f m",heighttoday));
-            if (heighttoday < Integer.valueOf(
-                    mSettings.getString(mPREF_TARGET_HEIGHT, "100"))) mHeightDailyText.setTextColor(Color.RED);
+            int dailyheight = Integer.valueOf(mSettings.getString(mPREF_TARGET_HEIGHT, "100"));
+            if (heighttoday < dailyheight) {
+                mHeightDailyText.setTextColor(Color.RED);
+                mHeightDailyProgress.setProgress( (int)(100 * heighttoday) / dailyheight );
+            }
+            //Todo: set progress bar green
             else mHeightDailyText.setTextColor(Color.GREEN);
             mRunning = receive.getBooleanExtra("Registered",false);
 

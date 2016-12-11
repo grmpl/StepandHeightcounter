@@ -16,7 +16,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:baselineAligned="false">
 
         <RelativeLayout
             android:layout_weight="4"
@@ -148,22 +149,40 @@
             android:layout_weight="6"
             android:layout_width="wrap_content">
 
+            <ProgressBar
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:id="@+id/progressBarSteps"
+                android:layout_alignParentEnd="true" />
+
             <TextView
                 android:text="@string/daily_steps"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
+                android:layout_below="@+id/progressBarSteps"
                 android:id="@+id/textViewDailySteps"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textSize="18sp" />
+
+            <ProgressBar
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textViewDailySteps"
+                android:layout_alignStart="@+id/textViewDailySteps"
+                android:layout_marginTop="10dp"
+                android:id="@+id/progressBarHeight"
+                android:layout_alignParentEnd="true" />
 
             <TextView
                 android:text="@string/height_today"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/textViewDailySteps"
-                android:layout_alignStart="@+id/textViewDailySteps"
-                android:layout_marginTop="20dp"
+                android:layout_below="@+id/progressBarHeight"
+                android:layout_alignStart="@+id/progressBarHeight"
+                android:layout_marginTop="0dp"
                 android:id="@+id/textViewDailyHeight"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textSize="18sp" />
