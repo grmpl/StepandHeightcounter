@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -38,7 +39,7 @@ import static grmpl.mk.stepandheightcounter.Constants.*;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView mStatusText, mHeightText, mStepText, mHeightaccText;
+    private TextView mStatusText, mHeightText, mStepText, mHeightaccText, mStepDailyText, mHeightDailyText;
     private EditText mCalibrateIn;
     private Button mStartButton;
     boolean mBounded = false, mRunning = false;
@@ -66,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
         mStartButton = (Button)findViewById(R.id.buttonStart);
         mCalibrateIn = (EditText)findViewById(R.id.editTextHeightcal);
         mStartButton = (Button)findViewById(R.id.buttonStart);
+        mStepDailyText = (TextView)findViewById(R.id.textViewDailyStepsNum);
+        mHeightDailyText = (TextView)findViewById(R.id.textViewDailyHeightNum);
 
         mStartButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -264,6 +267,16 @@ public class MainActivity extends AppCompatActivity {
             mHeightText.setText(String.format(Locale.getDefault(),"%.1f m",height));
             Float heightacc = receive.getFloatExtra("Heightacc",0F);
             mHeightaccText.setText(String.format(Locale.getDefault(),"%.1f m",heightacc));
+            Float stepstoday = receive.getFloatExtra("Stepstoday",0F);
+            mStepDailyText.setText(String.format(Locale.getDefault(),"%.0f",stepstoday));
+            if (stepstoday < Integer.valueOf(
+                    mSettings.getString(mPREF_TARGET_STEPS, "100000"))) mStepDailyText.setTextColor(Color.RED);
+            else mStepDailyText.setTextColor(Color.GREEN);
+            Float heighttoday = receive.getFloatExtra("Heighttoday",0F);
+            mHeightDailyText.setText(String.format(Locale.getDefault(),"%.1f m",heighttoday));
+            if (heighttoday < Integer.valueOf(
+                    mSettings.getString(mPREF_TARGET_HEIGHT, "100"))) mHeightDailyText.setTextColor(Color.RED);
+            else mHeightDailyText.setTextColor(Color.GREEN);
             mRunning = receive.getBooleanExtra("Registered",false);
 
             if(mRunning){

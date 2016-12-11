@@ -68,5 +68,9 @@
     <string name="cant_write_sdcard">Can\'t write to SD-Card!</string>
     <string name="permission_sdcard_granted">Permission for SD Card granted</string>
     <string name="no_write_sdcard_settings_disbled">Can\'t write to SD Card. Write settings disabled.</string>
+    <string name="daily_steps">Steps today:</string>
+    <string name="height_today">Height today:</string>
+    <string name="height">Height</string>
+    <string name="pref_cat_target">Daily target values</string>
 
 </resources>

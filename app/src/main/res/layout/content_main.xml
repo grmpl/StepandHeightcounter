@@ -102,7 +102,7 @@
         android:layout_marginTop="29dp"
         style="@android:style/Widget.Holo.Button"
         android:onClick="calibrateHeight"
-        android:layout_toRightOf="@id/editTextHeightcal"
+        android:layout_toEndOf="@id/editTextHeightcal"
         android:layout_alignBaseline="@id/editTextHeightcal"/>
 
     <TextView
@@ -145,8 +145,54 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:textSize="18sp"
         android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:layout_below="@+id/textViewError"
         android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="@string/daily_steps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buttonReset"
+        android:layout_alignStart="@+id/buttonReset"
+        android:layout_marginTop="50dp"
+        android:id="@+id/textViewDailySteps"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textSize="18sp" />
+
+    <TextView
+        android:text="@string/height_today"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewDailySteps"
+        android:layout_alignStart="@+id/textViewDailySteps"
+        android:layout_marginTop="20dp"
+        android:id="@+id/textViewDailyHeight"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textSize="18sp" />
+
+    <TextView
+        android:text="@string/zero"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewDailyStepsNum"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textSize="18sp"
+        android:layout_alignBaseline="@+id/textViewDailySteps"
+        android:layout_alignBottom="@+id/textViewDailySteps"
+        android:layout_alignEnd="@+id/textViewStepO"
+        android:layout_marginTop="17dp" />
+
+    <TextView
+        android:text="@string/zero_m"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewDailyHeightNum"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textSize="18sp"
+        android:layout_alignBaseline="@+id/textViewDailyHeight"
+        android:layout_alignBottom="@+id/textViewDailyHeight"
+        android:layout_alignEnd="@+id/textViewStepO"
+        android:layout_marginTop="17dp" />
 
 </RelativeLayout>

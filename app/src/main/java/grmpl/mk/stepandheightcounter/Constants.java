@@ -23,6 +23,8 @@ final class Constants {
 
     // Preferences
     final static String mPREF_DEBUG = "pref_debug";
+    final static String mPREF_TARGET_STEPS = "pref_target_steps";
+    final static String mPREF_TARGET_HEIGHT = "pref_target_height";
     final static String mPREF_STAT_DETAIL = "pref_stat_detail";
     final static String mPREF_STAT_DETAIL_CLEAR = "pref_stat_detail_clear";
     final static String mPREF_STAT_DETAIL_CLEAR_NUM = "pref_stat_detail_clear_num";
@@ -67,6 +69,9 @@ final class Constants {
 
     // normal pressure on sea level
     final static float mPRESSURE_SEA = 1013.25F;
+
+    // init-value for height reference
+    final static float mINIT_HEIGHT_REF = -9999;
 
     // we take care of new step sensor values only if more steps than this were taken
     final static int mMIN_STEPS_DELTA = 3;

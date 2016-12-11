@@ -53,7 +53,7 @@ public class SensorService extends Service {
     private float         mHeightBefore = 0;
     // Reference height
     private long          mHeightRefTimestamp = 0;  //nanoseconds
-    private float         mHeightRef = 0;
+    private float         mHeightRef = mINIT_HEIGHT_REF;
 
     // timestamp of sensor events (nanoseconds!)
     private long mEvtTimestampMilliSec = 0; // we only need one timestamp for all *Cumul-values
@@ -264,7 +264,7 @@ public class SensorService extends Service {
         mTimestampDeltaMilliSec = 0; // shouldn't be necessary, just make sure
 
         //after restart height reference will not be valid anymore
-        mHeightRef = 0;
+        mHeightRef = mINIT_HEIGHT_REF;
 
 
         mAlarm.cancelAlarm(this);
@@ -381,18 +381,22 @@ public class SensorService extends Service {
 
                 // then check if we have height to count
                 // If steps take longer than 5 seconds, assume we do not walk,
-                // so just save height as new reference and don't count it
-                if ((values.steptimestamp - mStepValuesCorrBefore.steptimestamp)
-                        / (values.stepstotal - mStepValuesCorrBefore.stepstotal)
-                        > mMAX_STEP_DURATION * mNANO_IN_SECONDS) {
-                    mHeightRef = height;
-                    mHeightRefTimestamp = values.steptimestamp;
-                } // ascending too fast - don't count it
-                else if ((height - mHeightBefore)
-                        / (values.steptimestamp - mStepValuesCorrBefore.steptimestamp)
-                        > mMAX_ELEV_GAIN) {
-                    mHeightRef = height;
-                    mHeightRefTimestamp = values.steptimestamp;
+                // or if we are ascending too fast
+                // or mHeightRef was resetted just now
+                // just save height as new reference and don't count it
+
+                if ( ( (values.steptimestamp - mStepValuesCorrBefore.steptimestamp)
+                           / (values.stepstotal - mStepValuesCorrBefore.stepstotal)
+                           > mMAX_STEP_DURATION * mNANO_IN_SECONDS
+                     ) ||
+                     ( (height - mHeightBefore)
+                           / (values.steptimestamp - mStepValuesCorrBefore.steptimestamp)
+                           > mMAX_ELEV_GAIN
+                     ) ||
+                     ( mHeightRef <= mINIT_HEIGHT_REF )
+                   ) {
+                       mHeightRef = height;
+                       mHeightRefTimestamp = values.steptimestamp;
                 } else {
                     // Here is the only place where we count the ascending
                     // only count if ascending is greater than 1m
@@ -461,6 +465,8 @@ public class SensorService extends Service {
             callback.putExtra("Height", height);
             callback.putExtra("Heightacc", mHeightCumul[0]);
             callback.putExtra("Registered", true);
+            callback.putExtra("Stepstoday", mStepsCumul[2]);
+            callback.putExtra("Heighttoday", mHeightCumul[2]);
             sendBroadcast(callback);
 
         }
@@ -666,7 +672,7 @@ public class SensorService extends Service {
     public void resetData() {
         mStepsCumul[0] = 0;
         mPressureZ = mPRESSURE_SEA;
-        mHeightRef = 0;
+        mHeightRef = mINIT_HEIGHT_REF; // 0 as init-value would not work at sea
         mHeightCumul[0] = 0;
         savePersistent();
         if (mSettings.getBoolean(mPREF_STAT_DETAIL, false))
@@ -682,6 +688,8 @@ public class SensorService extends Service {
         callback.putExtra("Height",getHeight());
         callback.putExtra("Heightacc",mHeightCumul[0]);
         callback.putExtra("Registered",mRegistered);
+        callback.putExtra("Stepstoday", mStepsCumul[2]);
+        callback.putExtra("Heighttoday", mHeightCumul[2]);
 
         sendBroadcast(callback);
     }
@@ -748,7 +756,7 @@ public class SensorService extends Service {
         //    if not, we don't have to care for all the other checks and just do nothing
         //    (shortest interval is 15 minutes, all intervals are aligned to 15 minutes)
 
-        if( mEvtTimestampMilliSec > 31536000000L &&  // plausibility: mEvtTimestampMilliSec should be at least in 1971
+        if( mEvtTimestampMilliSec > mMILLISECONDS_IN_YEAR &&  // plausibility: mEvtTimestampMilliSec should be at least in 1971
                 (mEvtTimestampMilliSec / (15 * 60 * 1000) < acttimestamp_msec / (15 * 60 * 1000))) {
             // Do we have to save regular statistics?
             if (mSettings.getBoolean(mPREF_STAT_HOUR, false)){
@@ -799,7 +807,7 @@ public class SensorService extends Service {
                     setevttimestamp = true;
                     // fill up all intervals without values, but not more than one week
                     if (currint - evtint > 8) evtint = currint - 8;
-                    for (long l = evtint + 2; l <= currint; l++)
+                    for (long l = evtint + 1; l < currint; l++)
                         mSave.saveStatistics( l * interval_msec - tz.getOffset(mEvtTimestampMilliSec), running, running, mSTAT_TYPE_DAILY);
                 }
                 //else nothing to do

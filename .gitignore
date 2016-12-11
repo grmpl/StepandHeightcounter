@@ -9,3 +9,5 @@
 .externalNativeBuild
 .idea/modules.xml
 .idea/gradle.xml
+.idea/vcs.xml
+

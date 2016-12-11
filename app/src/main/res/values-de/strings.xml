@@ -58,5 +58,8 @@
     <string name="permission_sdcard_granted">Zulassung zum Schreiben auf SD-Karte erhalten.</string>
     <string name="height_init1">999 m</string>
     <string name="pref_title_debug">Debug-Ausgaben</string>
-    <string name="debug_create_finished"></string>
+    <string name="daily_steps">Schritte heute:</string>
+    <string name="height_today">Höhe heute:</string>
+    <string name="height">Höhe</string>
+    <string name="pref_cat_target">Ziel für Tageswerte</string>
 </resources>
