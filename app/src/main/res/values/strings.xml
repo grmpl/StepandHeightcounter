@@ -54,13 +54,13 @@
     <string name="pref_stat_sum">Data will be saved to directory StepandHeightCounter on SD-Card</string>
     <string name="pref_title_stat_hour">Regular statistics</string>
     <string name="pref_title_stat_hour_clear">AutoClean of regular statistics</string>
-    <string name="pref_stat_clear_sum">Delete old files</string>
+    <string name="pref_stat_clear_sum">Delete old files.\n(Change will take effect when next file is created)</string>
     <string name="pref_title_stat_clear_num">Maximum files</string>
-    <string name="pref_stat_clear_num_sum">Maximum number of files to keep</string>
+    <string name="pref_stat_clear_num_sum">Maximum number of files to keep.\n(Change will take effect when next file is created)</string>
     <string name="pref_title_stat_hour_min">Interval</string>
     <string name="pref_stat_hour_min_sum">Interval for saving regular statistics</string>
     <string name="pref_title_stat_daily">Daily statistics</string>
-    <string name="pref_stat_daily_sum">Save step and elevation gain for every day. One file per year. There\'s no AutoClean.</string>
+    <string name="pref_stat_daily_sum">Save step and elevation gain for every day. One file per year.\nThere\'s no AutoClean.</string>
     <string name="pref_stat_hour_sum">Save step and elevation gain at a regular interval.</string>
     <string name="pref_stat_hour_list_1">15 minutes</string>
     <string name="pref_stat_hour_list_2">1/2 hour</string>

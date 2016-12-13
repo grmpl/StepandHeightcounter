@@ -40,7 +40,7 @@ public class SensorService extends Service {
     // correlate sensor timestamp and real time
     private long          mTimestampDeltaMilliSec;
     // counting the steps
-    private float[]       mStepsCumul = {0,0,0}; // 0: detail, 1: regulary, 2: daily
+    private float[]       mStepsCumul = {0,-1,-1}; // 0: detail, 1: regulary, 2: daily
     private float         mStepsSensBefore = 0;
     // atmospheric pressure, mpressure is initialized negative!
     private float         mPressure = -1, mPressureTemporary = 0, mPressureZ = mPRESSURE_SEA;
@@ -49,7 +49,7 @@ public class SensorService extends Service {
     private long          mPressStartTimestamp = 0; //nanoseconds
 
     // counting height
-    private float[]       mHeightCumul = {0,0,0}; // 0: detail, 1: regulary, 2: daily
+    private float[]       mHeightCumul = {0,-1,-1}; // 0: detail, 1: regulary, 2: daily
     private float         mHeightBefore = 0;
     // Reference height
     private long          mHeightRefTimestamp = 0;  //nanoseconds
@@ -218,6 +218,12 @@ public class SensorService extends Service {
             // Check, if we have statistic data from previous run to save
             periodicStatistics(System.currentTimeMillis(),mNOTRUNNING);
 
+            // if there was no measurement in this intervall, cumul-values are set to -1
+            if (mHeightCumul[1] < 0) mHeightCumul[1] = 0;
+            if (mHeightCumul[2] < 0) mHeightCumul[2] = 0;
+            if (mStepsCumul[1] < 0) mStepsCumul[1] = 0;
+            if (mStepsCumul[2] < 0) mStepsCumul[2] = 0;
+
 
             if (mSettings.getBoolean(mPREF_STAT_DETAIL, false))
             mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], mSTAT_TYPE_START);
@@ -229,6 +235,9 @@ public class SensorService extends Service {
             boolean succ = mSensorManager.registerListener(mSensorBarListener, mBarometer, SensorManager.SENSOR_DELAY_NORMAL);
             mRegistered = true;
             mSensorManager.requestTriggerSensor(mMotionListener, mMotion);
+            // update display
+            getValues();
+
             //now we can release the wakelock
             if (wakelock.isHeld()) wakelock.release();
             return succ;
@@ -269,7 +278,8 @@ public class SensorService extends Service {
 
         mAlarm.cancelAlarm(this);
         mRegistered = false;
-
+        // update display
+        getValues();
         // Now we don't care if we are killed
         stopForeground(true);
 
@@ -680,6 +690,10 @@ public class SensorService extends Service {
     }
 
     public void getValues() {
+        // if we are measuring, update statistic values
+        if (mRegistered) periodicStatistics(System.currentTimeMillis(),mISRUNNING);
+        else periodicStatistics(System.currentTimeMillis(),mNOTRUNNING);
+
         Intent callback = new Intent();
         callback.setAction("grmpl.mk.stepandheighcounter.custom.intent.Callback");
 
@@ -767,14 +781,13 @@ public class SensorService extends Service {
                 long currint = acttimestamp_msec / interval_msec;
                 // if we have values from previous interval, last interval is finished, we can save them
                 if ( evtint < currint ){
-                    // evtint+1 is the end of the interval, evtint would be the start
+                    // we save with timestamp at end of interval, i.e. evtint+1
                     //  drawback: last interval of day is saved at next day 0:00
-                    //    alternative: save with timestamp 1 minute earlier (e.g. 12:29) -> not nice
-                    //    solution: check in save-method for 0:00 and save it as 24:00 -> complicated
+                    //    solution: check in save-method for 0:00 and save it as 24:00
                     mSave.saveStatistics( (evtint + 1) * interval_msec,
                             mStepsCumul[1],mHeightCumul[1],mSTAT_TYPE_REGULAR);
-                    mStepsCumul[1] = 0;
-                    mHeightCumul[1] = 0;
+                    mStepsCumul[1] = running;  // method can be called even if measurement is not running
+                    mHeightCumul[1] = running; // so we have to save actual state
                     // set evttimestamp, otherwise this function will be called repeatedly until next event (steps!) is saved
                     //  this should give always correct results as long as regular intervals are an integral divisor of day
                     setevttimestamp = true;
@@ -800,10 +813,11 @@ public class SensorService extends Service {
                 // if we have values from previous interval, last interval is finished, we can save them
                 if ( evtint < currint ){
                     // as our days are UTC-days ( integer * 24h ), we have to correct the timestamps with timezone-information
+                    //   timestamp for saving would be 0:00
                     mSave.saveStatistics( evtint * interval_msec - tz.getOffset(mEvtTimestampMilliSec),
                             mStepsCumul[2],mHeightCumul[2],mSTAT_TYPE_DAILY);
-                    mStepsCumul[2] = 0;
-                    mHeightCumul[2] = 0;
+                    mStepsCumul[2] = running;  //see above
+                    mHeightCumul[2] = running; //see above
                     setevttimestamp = true;
                     // fill up all intervals without values, but not more than one week
                     if (currint - evtint > 8) evtint = currint - 8;

@@ -15,31 +15,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewHeightO"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textAppearance="@android:style/TextAppearance.Material.Large"
         android:layout_alignBaseline="@+id/textViewHeight"
         android:layout_alignBottom="@+id/textViewHeight"
-        android:layout_alignEnd="@+id/textViewStepO"
-        android:textSize="18sp" />
+        android:layout_alignEnd="@+id/textViewStepO" />
 
     <TextView
         android:text="@string/height_actual"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewHeight"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:layout_marginTop="17dp"
+        android:textAppearance="@android:style/TextAppearance.Material.Large"
+        android:layout_marginTop="@dimen/default_gap"
         android:layout_below="@+id/textViewSteps"
-        android:layout_alignStart="@+id/textViewSteps"
-        android:textSize="18sp" />
+        android:layout_alignStart="@+id/textViewSteps" />
 
     <TextView
         android:text="@string/height_accumulated"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewHeightacc"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textSize="18sp"
-        android:layout_marginTop="17dp"
+        android:textAppearance="@android:style/TextAppearance.Material.Large"
+        android:layout_marginTop="@dimen/default_gap"
+        android:layout_marginBottom="@dimen/default_gap"
         android:layout_below="@+id/textViewHeight"
         android:layout_alignStart="@+id/textViewSteps" />
 
@@ -48,8 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewHeightaccO"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textSize="18sp"
+        android:textAppearance="@android:style/TextAppearance.Material.Large"
         android:layout_alignBaseline="@+id/textViewHeightacc"
         android:layout_alignBottom="@+id/textViewHeightacc"
         android:layout_alignEnd="@+id/textViewStepO"
@@ -61,8 +58,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/buttonReset"
         android:onClick="resetData"
-        style="@android:style/Widget.Holo.Button"
-        android:layout_marginTop="30dp"
+        style="@android:style/Widget.Material.Button"
+        android:layout_marginTop="@dimen/default_gap"
+        android:layout_marginBottom="@dimen/default_gap"
         android:layout_below="@+id/editTextHeightcal"
         android:layout_alignStart="@+id/textViewSteps" />
 
@@ -81,17 +79,17 @@
         android:inputType="number"
         android:ems="10"
         android:id="@+id/editTextHeightcal"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        style="@style/Widget.AppCompat.EditText"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        style="@android:style/Widget.Material.EditText"
         android:visibility="visible"
         android:background="@android:drawable/editbox_background"
         android:selectAllOnFocus="false"
-        android:textSize="18sp"
         android:hint="@string/height_m"
         android:maxLines="1"
         android:layout_alignStart="@+id/textViewSteps"
         android:layout_below="@id/textViewHeightacc"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="@dimen/default_gap"
+        android:layout_marginBottom="@dimen/default_gap"
         android:layout_marginEnd="25dp"/>
 
     <Button
@@ -100,21 +98,32 @@
         android:layout_height="wrap_content"
         android:id="@+id/buttonCalibrate"
         android:layout_marginTop="29dp"
-        style="@android:style/Widget.Holo.Button"
+        style="@android:style/Widget.Material.Button"
         android:onClick="calibrateHeight"
         android:layout_toEndOf="@id/editTextHeightcal"
         android:layout_alignBaseline="@id/editTextHeightcal"/>
+
+    <Button
+        android:text="@string/button_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button"
+        android:layout_marginTop="5dp"
+        android:textAlignment="center"
+        style="@android:style/Widget.Material.Button"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:text="@string/zero"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewStepO"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textSize="18sp"
+        android:textAppearance="@android:style/TextAppearance.Material.Large"
         android:layout_above="@+id/textViewHeight"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="10dp" />
+
 
     <TextView
         android:text="@string/text_reset"
@@ -123,17 +132,16 @@
         android:id="@+id/textView"
         android:layout_alignBaseline="@+id/buttonReset"
         android:layout_toEndOf="@+id/buttonReset"
-        android:layout_marginStart="5dp"
-        android:textSize="16sp" />
+        android:layout_marginStart="5dp" />
 
     <Button
         android:text="@string/button_pause"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/buttonStart"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="0dip"
         android:textAlignment="center"
-        style="@android:style/Widget.Holo.Button"
+        style="@android:style/Widget.Material.Button"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
@@ -142,9 +150,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewSteps"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textSize="18sp"
-        android:layout_marginTop="20dp"
+        android:textAppearance="@android:style/TextAppearance.Material.Large"
+        android:layout_marginTop="@dimen/default_gap"
         android:layout_marginStart="10dp"
         android:layout_below="@+id/textViewError"
         android:layout_alignParentStart="true" />
@@ -155,9 +162,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/buttonReset"
         android:layout_alignStart="@+id/buttonReset"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dip"
         android:id="@+id/progressBarSteps"
-        android:layout_alignEnd="@+id/textViewStepO" />
+        android:layout_alignEnd="@+id/textViewStepO"
+        android:progressBackgroundTint="@android:color/darker_gray" />
 
     <TextView
         android:text="@string/daily_steps"
@@ -167,8 +175,8 @@
         android:layout_alignStart="@+id/progressBarSteps"
         android:layout_marginTop="0dp"
         android:id="@+id/textViewDailySteps"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textSize="18sp" />
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        android:textColor="?android:attr/textColorPrimary" />
 
     <ProgressBar
         style="@android:style/Widget.ProgressBar.Horizontal"
@@ -176,9 +184,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textViewDailySteps"
         android:layout_alignStart="@+id/textViewDailySteps"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="@dimen/default_gap"
         android:id="@+id/progressBarHeight"
-        android:layout_alignEnd="@+id/textViewStepO" />
+        android:layout_alignEnd="@+id/textViewStepO"
+        android:progressBackgroundTint="@android:color/darker_gray"
+        android:max="100" />
 
     <TextView
         android:text="@string/height_today"
@@ -188,31 +198,31 @@
         android:layout_alignStart="@+id/progressBarHeight"
         android:layout_marginTop="0dp"
         android:id="@+id/textViewDailyHeight"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textSize="18sp" />
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        android:textColor="?android:attr/textColorPrimary" />
 
     <TextView
         android:text="@string/zero"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewDailyStepsNum"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textSize="18sp"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
         android:layout_alignBaseline="@+id/textViewDailySteps"
         android:layout_alignBottom="@+id/textViewDailySteps"
         android:layout_alignEnd="@+id/textViewStepO"
-        android:layout_marginTop="17dp" />
+        android:layout_marginTop="17dp"
+        android:textColor="?android:attr/textColorPrimary" />
 
     <TextView
         android:text="@string/zero_m"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewDailyHeightNum"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:textSize="18sp"
         android:layout_alignBaseline="@+id/textViewDailyHeight"
         android:layout_alignBottom="@+id/textViewDailyHeight"
         android:layout_alignEnd="@+id/textViewStepO"
-        android:layout_marginTop="17dp" />
+        android:layout_marginTop="17dp"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        android:textColor="?android:attr/textColorPrimary"/>
 
 </RelativeLayout>

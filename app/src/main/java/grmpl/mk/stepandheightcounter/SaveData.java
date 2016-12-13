@@ -135,9 +135,8 @@ class SaveData {
                     sdformat = new SimpleDateFormat("yyyy", Locale.US);
                     sdformati = new SimpleDateFormat("yyyy-MM-dd, zzz", Locale.US); // fixed formatting, not local formatting, day is enough
                     filenamet = mFILENAME_STAT_DAILY;
-                    autoclean = settings.getBoolean(mPREF_STAT_DAILY_CLEAR, false);
-                    keep = Integer.valueOf(
-                            settings.getString(mPREF_STAT_DAILY_CLEAR_NUM, "9999"));
+                    autoclean = false;
+                    keep = 9999;
                     break;
                 case mSTAT_TYPE_REGULAR:
                     sdformat = new SimpleDateFormat("yyyyMMdd", Locale.US);
@@ -146,6 +145,8 @@ class SaveData {
                     autoclean = settings.getBoolean(mPREF_STAT_HOUR_CLEAR, false);
                     keep = Integer.valueOf(
                             settings.getString(mPREF_STAT_HOUR_CLEAR_NUM, "9999"));
+                    // to save the last interval not at next day 0:00, but on this day 24:00 we adjust the time a little bit
+                    timems = timems - 1;
                     break;
                 default:
                     sdformat = new SimpleDateFormat("yyyyMMdd", Locale.US);
@@ -172,8 +173,12 @@ class SaveData {
             File file = new File(directory + File.separator + sdformat.format(timems) + filenamet);
             FileOutputStream out = null;
             // We choose "," as separator, as this seems to be more common than ";"
-            // Correlation timestamp
-            String outline = sdformati.format(timems) + ",";
+            // We take back the adjustment of regular intervals from above to get proper timestamps ( 0:59 looks ugly)
+            //  for daily statistics (0:00) and detail statistics (actual timestamp) 1 msec doesn't make a difference
+            String outline = sdformati.format(timems+1) + ",";
+            // For the last interval of the day we must make adjustments
+            if (outline.regionMatches(11,"00:00",0,5))
+                outline = (sdformati.format(timems) + ",").replace("23:59","24:00");
             outline = outline + String.format(Locale.US, "%.0f, %.0f, ", stepscumul, heightcumul) + type + "\n";
 
             try {

@@ -10,7 +10,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -19,6 +19,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -178,17 +179,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void startLogger() {
         boolean succ = mSensService.startListeners();
-        if(succ) {
-            mStatusText.setText(R.string.sensor_active);
-            mStartButton.setText(R.string.button_running);
-            mStartButton.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View v){
-                    stopLogger();
-                }
-            });
-            if (mSettings.getBoolean(mPREF_DEBUG,false))
-                Toast.makeText(MainActivity.this, R.string.debug_listener_started, Toast.LENGTH_SHORT).show();
-        }
+        if(succ && mSettings.getBoolean(mPREF_DEBUG,false))
+            Toast.makeText(MainActivity.this, R.string.debug_listener_started, Toast.LENGTH_SHORT).show();
         else mStatusText.setText(R.string.sensor_register_failed); //Reregistering when already running will give an error, too!
     }
 
@@ -197,13 +189,7 @@ public class MainActivity extends AppCompatActivity {
           Unregister sensors and save actual steps to evaluate pause steps later
         */
         if (mSensService != null) mSensService.stopListeners();
-        mStatusText.setText(R.string.sensor_pause);
-        mStartButton.setText(R.string.button_pause);
-        mStartButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                startLogger();
-            }
-        });
+        if(mSettings.getBoolean(mPREF_DEBUG,false)) mStatusText.setText(R.string.sensor_pause);
     }
 
     public void resetData(View view) {
@@ -275,20 +261,32 @@ public class MainActivity extends AppCompatActivity {
             mStepDailyText.setText(String.format(Locale.getDefault(),"%.0f",stepstoday));
             int dailysteps = Integer.valueOf(mSettings.getString(mPREF_TARGET_STEPS, "100000"));
             if (stepstoday < dailysteps) {
-                mStepDailyText.setTextColor(Color.RED);
+                // difficult to read, bar color sufficient: mStepDailyText.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
                 mStepDailyProgress.setProgress( (int)(100 * stepstoday) / dailysteps );
+                mStepDailyProgress.setProgressTintList(
+                        ColorStateList.valueOf(ContextCompat.getColor(context,R.color.colorAccent)));
             }
-            //Todo: set progress bar green
-            else mStepDailyText.setTextColor(Color.GREEN);
+            else {
+                // difficult to read, bar color sufficient: mStepDailyText.setTextColor(ContextCompat.getColor(context,R.color.colorPrimaryDark));
+                mStepDailyProgress.setProgress( 100 );
+                mStepDailyProgress.setProgressTintList(
+                        ColorStateList.valueOf(ContextCompat.getColor(context,R.color.colorPrimaryDark)));
+            }
             Float heighttoday = receive.getFloatExtra("Heighttoday",0F);
             mHeightDailyText.setText(String.format(Locale.getDefault(),"%.1f m",heighttoday));
             int dailyheight = Integer.valueOf(mSettings.getString(mPREF_TARGET_HEIGHT, "100"));
             if (heighttoday < dailyheight) {
-                mHeightDailyText.setTextColor(Color.RED);
+                // difficult to read, bar color sufficient: mHeightDailyText.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
                 mHeightDailyProgress.setProgress( (int)(100 * heighttoday) / dailyheight );
+                mHeightDailyProgress.setProgressTintList(
+                        ColorStateList.valueOf(ContextCompat.getColor(context,R.color.colorAccent)));
             }
-            //Todo: set progress bar green
-            else mHeightDailyText.setTextColor(Color.GREEN);
+            else {
+                // difficult to read, bar color sufficient: mHeightDailyText.setTextColor(ContextCompat.getColor(context,R.color.colorPrimaryDark));
+                mHeightDailyProgress.setProgress( 100 );
+                mHeightDailyProgress.setProgressTintList(
+                        ColorStateList.valueOf(ContextCompat.getColor(context,R.color.colorPrimaryDark)));
+            }
             mRunning = receive.getBooleanExtra("Registered",false);
 
             if(mRunning){

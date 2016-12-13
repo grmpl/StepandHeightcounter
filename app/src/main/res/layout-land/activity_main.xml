@@ -24,10 +24,11 @@
     <android.support.design.widget.FloatingActionButton android:id="@+id/fab"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_menu_set_as"
+        app:srcCompat="?attr/actionModePasteDrawable"
         app:layout_anchor="@+id/include"
         app:layout_anchorGravity="bottom|right"
-        android:layout_gravity="top|left" />
+        android:layout_gravity="top|left"
+        android:tint="@android:color/darker_gray" />
 
 
 

@@ -33,8 +33,6 @@ final class Constants {
     final static String mPREF_STAT_HOUR_CLEAR ="pref_stat_hour_clear";
     final static String mPREF_STAT_HOUR_CLEAR_NUM ="pref_stat_hour_clear_num";
     final static String mPREF_STAT_DAILY ="pref_stat_daily";
-    final static String mPREF_STAT_DAILY_CLEAR ="pref_stat_daily_clear";
-    final static String mPREF_STAT_DAILY_CLEAR_NUM ="pref_stat_daily_clear_num";
 
     // Files
     final static String mDIRECTORY = "StepandHeightCounter";

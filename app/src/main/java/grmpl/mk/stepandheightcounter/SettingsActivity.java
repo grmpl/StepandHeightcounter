@@ -1,16 +1,21 @@
 package grmpl.mk.stepandheightcounter;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
 import android.widget.Toast;
 
-public class SettingsActivity extends PreferenceActivity {
+import static grmpl.mk.stepandheightcounter.Constants.*;
+
+public class SettingsActivity extends PreferenceActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
+
     }
 
     public static class MyPreferenceFragment extends PreferenceFragment
@@ -28,7 +33,22 @@ public class SettingsActivity extends PreferenceActivity {
                 preferenceGroup.setEnabled(false);
                 Toast.makeText(getActivity(), R.string.no_write_sdcard_settings_disbled, Toast.LENGTH_LONG).show();
             }
+
+
+            Preference.OnPreferenceChangeListener changelistener =  new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object value) {
+                    //  Value of 0 will not be accepted for max number of files
+                    return !( (preference.getKey().equals(mPREF_STAT_HOUR_CLEAR_NUM) || preference.getKey().equals(mPREF_STAT_DETAIL_CLEAR_NUM) )
+                            && Integer.valueOf(value.toString()) < 1 );
+
+                }
+            };
+            findPreference(mPREF_STAT_HOUR_CLEAR_NUM).setOnPreferenceChangeListener(changelistener);
+            findPreference(mPREF_STAT_DETAIL_CLEAR_NUM).setOnPreferenceChangeListener(changelistener);
         }
     }
+
+
 
 }
