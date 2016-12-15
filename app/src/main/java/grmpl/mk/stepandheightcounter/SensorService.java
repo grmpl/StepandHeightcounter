@@ -218,11 +218,13 @@ public class SensorService extends Service {
             // Check, if we have statistic data from previous run to save
             periodicStatistics(System.currentTimeMillis(),mNOTRUNNING);
 
-            // if there was no measurement in this intervall, cumul-values are set to -1
+            // if there was no measurement in this intervall, cumul-values will be set to -1
             if (mHeightCumul[1] < 0) mHeightCumul[1] = 0;
             if (mHeightCumul[2] < 0) mHeightCumul[2] = 0;
             if (mStepsCumul[1] < 0) mStepsCumul[1] = 0;
             if (mStepsCumul[2] < 0) mStepsCumul[2] = 0;
+            // change should be saved
+            savePersistent();
 
 
             if (mSettings.getBoolean(mPREF_STAT_DETAIL, false))

@@ -44,7 +44,7 @@
     <string name="running">running</string>
     <string name="stepsensor_not_activated">Step sensor cannot be activated!</string>
     <string name="pref_title_stat_detail">Detailed statistics</string>
-    <string name="pref_stat_detail_sum">Saves every step sensor event with current steps and elevation gain. One file per day.</string>
+    <string name="pref_stat_detail_sum">Saves every step sensor event and markers with current steps and elevation gain. One file per day.\nIf disabled, markers will be saved nevertheless.</string>
     <string name="pref_cat_stat">Statistics</string>
     <string name="pref_title_stat_detail_clear">AutoClean of detailed statistic data</string>
     <string name="pref_cat_stat_det">Detailed statistics</string>

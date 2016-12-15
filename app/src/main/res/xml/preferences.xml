@@ -30,7 +30,7 @@
             android:key="pref_stat_detail_clear"
             android:title="@string/pref_title_stat_detail_clear"
             android:summary="@string/pref_stat_clear_sum"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:dependency="pref_stat_detail" />
         <EditTextPreference
             android:key="pref_stat_detail_clear_num"

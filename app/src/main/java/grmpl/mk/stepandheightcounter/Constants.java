@@ -55,7 +55,7 @@ final class Constants {
     final static long mWAKELOCK_SETTLE_PRESSURE = 5000; // for pressure sensor initialization
 
     // alarm interval
-    final static long mALARM_INTERVAL = 120000; // 4 minutes was too long sometimes, let's take 2 minutes 
+    final static long mALARM_INTERVAL = 150000; // 4 minutes was too long sometimes, let's take 2 minutes
 
     // delay correlation a little bit, to wait for pressure
     final static long mDELAY_CORRELATION_FIRST = 1000;
