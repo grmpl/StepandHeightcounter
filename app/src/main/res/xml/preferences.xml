@@ -26,19 +26,26 @@
             android:title="@string/pref_title_stat_detail"
             android:summary="@string/pref_stat_detail_sum"
             android:defaultValue="false" />
+        <MultiSelectListPreference
+            android:key="pref_stat_detail_multi"
+            android:title="Detailed statistics"
+            android:summary="Save every step sensor event or special events with according step values and elevation gain. Markers will always be saved. One file per day."
+            android:dialogTitle="Detailed statistics"
+            android:entries="@array/detail_stat"
+            android:entryValues="@array/detail_stat_values"
+            android:defaultValue="@array/detail_stat_default_values"
+            />
         <CheckBoxPreference
             android:key="pref_stat_detail_clear"
             android:title="@string/pref_title_stat_detail_clear"
             android:summary="@string/pref_stat_clear_sum"
-            android:defaultValue="false"
-            android:dependency="pref_stat_detail" />
+            android:defaultValue="false" />
         <EditTextPreference
             android:key="pref_stat_detail_clear_num"
             android:title="@string/pref_title_stat_clear_num"
             android:summary="@string/pref_stat_clear_num_sum"
             android:defaultValue="7"
-            android:numeric="integer"
-            android:dependency="pref_stat_detail_clear"/>
+            android:numeric="integer" />
         <CheckBoxPreference
             android:key="pref_stat_hour"
             android:title="@string/pref_title_stat_hour"
@@ -64,12 +71,12 @@
             android:summary="@string/pref_stat_clear_num_sum"
             android:defaultValue="15"
             android:numeric="integer"
-            android:dependency="pref_stat_hour_clear"/>
+            android:dependency="pref_stat_hour_clear" />
         <CheckBoxPreference
             android:key="pref_stat_daily"
             android:title="@string/pref_title_stat_daily"
             android:summary="@string/pref_stat_daily_sum"
-            android:defaultValue="false" />
+            android:defaultValue="true" />
     </PreferenceCategory>
 
 
