@@ -62,4 +62,10 @@
     <string name="height_today">Höhe heute:</string>
     <string name="height">Höhe</string>
     <string name="pref_cat_target">Ziele für Tageswerte</string>
+    <string name="pref_stat_detail_marker">Marker</string>
+    <string name="pref_stat_detail_start">Start Messung</string>
+    <string name="pref_stat_detail_steps">Schrittzähler Ereignisse</string>
+    <string name="pref_stat_detail_stop">Stop Messung</string>
+    <string name="pref_stat_detail_multi_title">Detaillierte Statistiken</string>
+    <string name="pref_stat_detail_multi_summary">Ereignisse des Schrittzählers, Start und Stopp der Messung und Marker können gesichert werden. Eine Datei pro Tag.</string>
 </resources>

@@ -28,8 +28,8 @@
             android:defaultValue="false" />
         <MultiSelectListPreference
             android:key="pref_stat_detail_multi"
-            android:title="Detailed statistics"
-            android:summary="Save every step sensor event or special events with according step values and elevation gain. Markers will always be saved. One file per day."
+            android:title="@string/pref_stat_detail_multi_title"
+            android:summary="@string/pref_stat_detail_multi_summary"
             android:dialogTitle="Detailed statistics"
             android:entries="@array/detail_stat"
             android:entryValues="@array/detail_stat_values"

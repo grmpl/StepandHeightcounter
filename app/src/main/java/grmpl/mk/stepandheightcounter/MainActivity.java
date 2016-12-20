@@ -157,8 +157,8 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     Snackbar.make(view, R.string.saving_marker, Snackbar.LENGTH_LONG).show();
-                    mSave.saveStatistics(System.currentTimeMillis(), mSettings.getFloat("mStepsCum", 0),
-                            mSettings.getFloat("mHeightAcc", 0), mSTAT_TYPE_MARK);
+                    mSave.saveStatistics(System.currentTimeMillis(), mSettings.getFloat("mStepsCumul0", 0),
+                            mSettings.getFloat("mHeightCumul0", 0), mSTAT_TYPE_MARK);
                 }
             });
     }
@@ -185,7 +185,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void stopLogger() {
-        /* 
+        /*
+           Todo: Service could be stopped completely. Keeping service alive is a relict from
+                  previous versions where I didn't have implemented the persistency.
+                  Rework has to be done carefully, I don't know where I anticipate a running service.
+         */
+
+        /*
           Unregister sensors and save actual steps to evaluate pause steps later
         */
         if (mSensService != null) mSensService.stopListeners();

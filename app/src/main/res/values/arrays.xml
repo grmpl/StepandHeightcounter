@@ -10,4 +10,23 @@
         <item>30</item>
         <item>60</item>
     </string-array>
+    <string-array name="detail_stat">
+        <item>@string/pref_stat_detail_steps</item>
+        <item>@string/pref_stat_detail_start</item>
+        <item>@string/pref_stat_detail_stop</item>
+        <item>@string/pref_stat_detail_marker</item>
+    </string-array>
+    <string-array name="detail_stat_values">
+        <item>1</item>
+        <item>2</item>
+        <item>4</item>
+        <item>8</item>
+    </string-array>
+    <string-array name="detail_stat_default_values">
+        <item>8</item>
+    </string-array>
+    <string name="pref_stat_detail_steps">Step events</string>
+    <string name="pref_stat_detail_start">Start measurement</string>
+    <string name="pref_stat_detail_stop">Stop measurement</string>
+    <string name="pref_stat_detail_marker">Marker</string>
 </resources>

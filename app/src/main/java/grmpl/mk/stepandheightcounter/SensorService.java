@@ -31,6 +31,12 @@ import static java.lang.Math.pow;
 
 
 
+/* Todo: Evaluate MultiSelectListPreference for saving preferences 
+          Set stringset = getStringseet(key,default)
+          for(String s:  stringset ) { doSomethingWithString(s); }
+   Todo: Save height in detailed statistics -> calibrate-event, too
+i*/
+
 public class SensorService extends Service {
 
     // ** Simple objects **

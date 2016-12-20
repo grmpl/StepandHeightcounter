@@ -72,5 +72,7 @@
     <string name="height_today">Height today:</string>
     <string name="height">Height</string>
     <string name="pref_cat_target">Daily target values</string>
+    <string name="pref_stat_detail_multi_title">Detailed statistics</string>
+    <string name="pref_stat_detail_multi_summary">Save every step sensor event or special events with according step values and elevation gain. One file per day.</string>
 
 </resources>
