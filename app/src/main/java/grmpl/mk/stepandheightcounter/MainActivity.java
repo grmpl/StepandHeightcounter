@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Locale;
+import java.util.Set;
 
 import grmpl.mk.stepandheightcounter.SensorService.LocalBinder;
 
@@ -44,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView mStatusText, mHeightText, mStepText, mHeightaccText, mStepDailyText, mHeightDailyText;
     private EditText mCalibrateIn;
     private Button mStartButton;
+    private FloatingActionButton mFloatingButton;
+
     private ProgressBar mStepDailyProgress, mHeightDailyProgress;
     boolean mBounded = false, mRunning = false;
     SensorService mSensService;
@@ -59,10 +62,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
+        // Access to persistent data
         mSettings = PreferenceManager.getDefaultSharedPreferences(this);
 
-
+        // Get all necessary elements
         mStatusText = (TextView)findViewById(R.id.textViewError);
         mHeightText = (TextView)findViewById(R.id.textViewHeightO);
         mHeightaccText = (TextView)findViewById(R.id.textViewHeightaccO);
@@ -74,7 +77,10 @@ public class MainActivity extends AppCompatActivity {
         mHeightDailyText = (TextView)findViewById(R.id.textViewDailyHeightNum);
         mStepDailyProgress = (ProgressBar)findViewById(R.id.progressBarSteps);
         mHeightDailyProgress = (ProgressBar)findViewById(R.id.progressBarHeight);
+        mFloatingButton = (FloatingActionButton) findViewById(R.id.fab);
 
+
+        // initialize start button
         mStartButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 startLogger();
@@ -97,15 +103,16 @@ public class MainActivity extends AppCompatActivity {
 
         // Start my service - multiple calls of start are no problem, they don't start the
         //  service again, they just call the onStartCommand method of the service
-        //   ("start" is just logical activating - code is only run when event is happening!!)
+        //   ("start" is just logical activating and ressource allocation - code is only run when event is happening!!)
         startService(new Intent(this, SensorService.class));
         // bind to it
         bindService(new Intent(this,
                 SensorService.class), mConnection, Context.BIND_AUTO_CREATE);
 
 
-        if (mSettings.getBoolean(mPREF_DEBUG,false))
+        if (mSettings.getBoolean(cPREF_DEBUG,false))
             Toast.makeText(MainActivity.this, R.string.debug_create_finished, Toast.LENGTH_SHORT).show();
+        // we need access to SD-Card
         if (mSettings.getBoolean("mReqSDPermission",true))
             ActivityCompat.requestPermissions(MainActivity.this,
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
@@ -114,19 +121,19 @@ public class MainActivity extends AppCompatActivity {
 
     ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceDisconnected(ComponentName name) {
-            if (mSettings.getBoolean(mPREF_DEBUG,false))
+            if (mSettings.getBoolean(cPREF_DEBUG,false))
                 Toast.makeText(MainActivity.this, R.string.debug_service_disconnected, Toast.LENGTH_SHORT).show();
             mBounded = false;
             mSensService = null;
         }
         public void onServiceConnected(ComponentName name, IBinder service) {
-            if (mSettings.getBoolean(mPREF_DEBUG,false))
+            if (mSettings.getBoolean(cPREF_DEBUG,false))
                 Toast.makeText(MainActivity.this, R.string.debug_service_connected, Toast.LENGTH_SHORT).show();
             mBounded = true;
             LocalBinder mLocalBinder = (LocalBinder)service;
             mSensService = mLocalBinder.getServerInstance();
             mSensService.getValues();
-            getHeight();
+            getHeightRegulary();
         }
     };
 
@@ -137,34 +144,39 @@ public class MainActivity extends AppCompatActivity {
         // get actual values
         if(mSensService != null ) {
             mSensService.getValues();
-            getHeight();
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        // permissions and settings could change during pause
         mSave = new SaveData(this);
         if (!(new CheckSDCard(this).checkWriteSDCard())) {
+            mFloatingButton.setVisibility(View.VISIBLE);
             Toast.makeText(MainActivity.this, R.string.cant_write_sdcard, Toast.LENGTH_LONG).show();
 
-            fab.setOnClickListener(new View.OnClickListener() {
+            mFloatingButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Snackbar.make(view, R.string.cant_write_sdcard, Snackbar.LENGTH_LONG).show();
                 }
             });
         }
-        else
-            fab.setOnClickListener(new View.OnClickListener() {
+        else if (getDetailSave("m")) {
+            mFloatingButton.setVisibility(View.VISIBLE);
+            mFloatingButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    float height;
                     Snackbar.make(view, R.string.saving_marker, Snackbar.LENGTH_LONG).show();
+                    if (mSensService != null) height = mSensService.getHeight();
+                    else height = -9996;
                     mSave.saveStatistics(System.currentTimeMillis(), mSettings.getFloat("mStepsCumul0", 0),
-                            mSettings.getFloat("mHeightCumul0", 0), mSTAT_TYPE_MARK);
+                            mSettings.getFloat("mHeightCumul0", 0), height, cSTAT_TYPE_MARK);
                 }
             });
+        }
+        else mFloatingButton.setVisibility(View.GONE);
     }
 
     // Only unbind, if destroyed
-    // state is saved previously with onSaveInstanceState
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -177,13 +189,15 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    // action for start button: starting measurement
     public void startLogger() {
         boolean succ = mSensService.startListeners();
-        if(succ && mSettings.getBoolean(mPREF_DEBUG,false))
+        if(succ && mSettings.getBoolean(cPREF_DEBUG,false))
             Toast.makeText(MainActivity.this, R.string.debug_listener_started, Toast.LENGTH_SHORT).show();
         else mStatusText.setText(R.string.sensor_register_failed); //Reregistering when already running will give an error, too!
     }
 
+    // action for stop button: stopping measurement
     public void stopLogger() {
         /*
            Todo: Service could be stopped completely. Keeping service alive is a relict from
@@ -195,9 +209,10 @@ public class MainActivity extends AppCompatActivity {
           Unregister sensors and save actual steps to evaluate pause steps later
         */
         if (mSensService != null) mSensService.stopListeners();
-        if(mSettings.getBoolean(mPREF_DEBUG,false)) mStatusText.setText(R.string.sensor_pause);
+        if(mSettings.getBoolean(cPREF_DEBUG,false)) mStatusText.setText(R.string.sensor_pause);
     }
 
+    // action for reset button: reset values
     public void resetData(View view) {
         if (mSensService != null) mSensService.resetData();
         mStepText.setText(R.string.zero);
@@ -209,7 +224,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    // action for calibration button: calibrate height
     public void calibrateHeight(View view){
+        // Todo: Rework necessary if service will be stopped
+        //      Currently calibration is possible even if measurement is not started yet
+        //       but we need a running service for this
         if (mSensService != null) {
             float height;
             try {
@@ -222,24 +241,25 @@ public class MainActivity extends AppCompatActivity {
             mSensService.calibrateHeight(height);
             mHeightText.setText(String.format(Locale.getDefault(), "%.1f m", height));
         }
-        else if (mSettings.getBoolean(mPREF_DEBUG, false))
+        else if (mSettings.getBoolean(cPREF_DEBUG, false))
                 Toast.makeText(MainActivity.this, R.string.service_not_started, Toast.LENGTH_LONG).show();
 
-
+        // I don't remember why this is necessary:
         InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    void getHeight(){
+    // as long as service is running, we update height information regulary
+    void getHeightRegulary(){
         if (mSensService != null) {
             mHeightText.setText(String.format(Locale.getDefault(), "%.1f m", mSensService.getHeight()));
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    getHeight();
+                    getHeightRegulary();
                 }
-            }, mINTERVAL_UPDATE_HEIGHT);
+            }, cINTERVAL_UPDATE_HEIGHT);
         }
     }
 
@@ -248,9 +268,7 @@ public class MainActivity extends AppCompatActivity {
     /* Just create a class which extends Broadcastreceiver.
        Service will make a Broadcast and with "Intentfilter" it is assured, that only
        wanted messages are received.
-       Intentfilter cannot be registered in AndroidManifest.xml, otherwise this class has to be static.
-        But if it is static, is has no access to outer fields (here: mStatusText)
-        The only solution is to dynamically register the receiver -> see "onCreate"
+       We register it dynamically so we can use a non-static nested class
      */
     public class MyReceiver extends BroadcastReceiver {
         @Override
@@ -265,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
             mHeightaccText.setText(String.format(Locale.getDefault(),"%.1f m",heightacc));
             Float stepstoday = receive.getFloatExtra("Stepstoday",0F);
             mStepDailyText.setText(String.format(Locale.getDefault(),"%.0f",stepstoday));
-            int dailysteps = Integer.valueOf(mSettings.getString(mPREF_TARGET_STEPS, "100000"));
+            int dailysteps = Integer.valueOf(mSettings.getString(cPREF_TARGET_STEPS, "100000"));
             if (stepstoday < dailysteps) {
                 // difficult to read, bar color sufficient: mStepDailyText.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
                 mStepDailyProgress.setProgress( (int)(100 * stepstoday) / dailysteps );
@@ -280,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
             }
             Float heighttoday = receive.getFloatExtra("Heighttoday",0F);
             mHeightDailyText.setText(String.format(Locale.getDefault(),"%.1f m",heighttoday));
-            int dailyheight = Integer.valueOf(mSettings.getString(mPREF_TARGET_HEIGHT, "100"));
+            int dailyheight = Integer.valueOf(mSettings.getString(cPREF_TARGET_HEIGHT, "100"));
             if (heighttoday < dailyheight) {
                 // difficult to read, bar color sufficient: mHeightDailyText.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
                 mHeightDailyProgress.setProgress( (int)(100 * heighttoday) / dailyheight );
@@ -314,6 +332,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    // this is the callback if permission dialog is ended - we save the result
     @Override
     public void onRequestPermissionsResult(
             int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
@@ -335,9 +354,19 @@ public class MainActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                 }
             }
-
-
         }
+    }
+
+    // checking what values have to be saved in detail statistics
+    boolean getDetailSave(String identifier){
+        Set<String> detail_multi = mSettings.getStringSet(cPREF_STAT_DETAIL_MULTI, cPREF_STAT_DETAIL_MULTI_DEFAULT);
+
+        boolean ret = false;
+        for (String s:  detail_multi ) {
+            ret = ret || s.equals(identifier);
+        }
+
+        return ret;
     }
 
     @Override

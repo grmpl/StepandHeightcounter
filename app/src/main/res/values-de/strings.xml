@@ -64,8 +64,17 @@
     <string name="pref_cat_target">Ziele für Tageswerte</string>
     <string name="pref_stat_detail_marker">Marker</string>
     <string name="pref_stat_detail_start">Start Messung</string>
-    <string name="pref_stat_detail_steps">Schrittzähler Ereignisse</string>
+    <string name="pref_stat_detail_steps">Jedes Schrittzähler-Ereigniss</string>
     <string name="pref_stat_detail_stop">Stop Messung</string>
     <string name="pref_stat_detail_multi_title">Detaillierte Statistiken</string>
-    <string name="pref_stat_detail_multi_summary">Ereignisse des Schrittzählers, Start und Stopp der Messung und Marker können gesichert werden. Eine Datei pro Tag.</string>
+    <string name="pref_stat_detail_multi_summary">Verschiedene Ereignisse können gespeichert werden. Eine Datei pro Tag.</string>
+    <string name="pref_stat_detail_multi_dialog_title">Welche Daten sollen gespeichert werden?</string>
+    <string name="pref_stat_detail_calibration">Höheneinstellung</string>
+    <string name="pref_stat_detail_reset">Zurücksetzen der Werte</string>
+    <string name="save_stat_headline_height">Zeit, Zeitzone, Schritte, Höhenmeter, Höhe, Eintragstyp</string>
+    <string name="save_stat_headline">Zeit, Zeitzone, Schritte, Höhenmeter, Eintragstyp</string>
+    <string name="stat_type_calibration_after">Nach Höheneinstellung</string>
+    <string name="stat_type_calibration_before">Vor Höheneinstellung</string>
+    <string name="stat_type_reset_after">Nach Zurücksetzen</string>
+    <string name="stat_type_reset_before">Vor Zurücksetzen</string>
 </resources>
