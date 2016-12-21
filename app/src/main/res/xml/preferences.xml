@@ -57,15 +57,13 @@
             android:key="pref_stat_hour_clear"
             android:title="@string/pref_title_stat_hour_clear"
             android:summary="@string/pref_stat_clear_sum"
-            android:defaultValue="true"
-            android:dependency="pref_stat_hour" />
+            android:defaultValue="false" />
         <EditTextPreference
             android:key="pref_stat_hour_clear_num"
             android:title="@string/pref_title_stat_clear_num"
             android:summary="@string/pref_stat_clear_num_sum"
             android:defaultValue="15"
-            android:numeric="integer"
-            android:dependency="pref_stat_hour_clear" />
+            android:numeric="integer" />
         <CheckBoxPreference
             android:key="pref_stat_daily"
             android:title="@string/pref_title_stat_daily"
