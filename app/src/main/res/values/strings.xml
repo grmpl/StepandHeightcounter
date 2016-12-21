@@ -8,29 +8,28 @@
     <string name="sensor_register_failed">Register Stepsensor failed</string>
     <string name="sensor_pause">Stepsensor paused</string>
     <string name="button_pause">Start Measurement</string>
-    <string name="debug_create_finished">Create finished</string>
-    <string name="debug_service_disconnected">Service is disconnected</string>
-    <string name="debug_service_connected">Service is connected</string>
+    <string name="debug_create_finished" translatable="false">Create finished</string>
+    <string name="debug_service_disconnected" translatable="false">Service is disconnected</string>
+    <string name="debug_service_connected" translatable="false">Service is connected</string>
     <string name="button_restart">Restart application</string>
     <string name="calib_not_number">Not a number for height calibration</string>
     <string name="service_not_started">Sensor Service not started yet!</string>
-    <string name="debug_stat_step_event_after_pause">Step Counter after pause event saved</string>
-    <string name="debug_stat_step_event">Step Counter event saved</string>
-    <string name="debug_stat_pressure_old">No actual pressure value, putting additional task in queue 2 seconds later</string>
+    <string name="debug_stat_step_event_after_pause" translatable="false">Step Counter after pause event saved</string>
+    <string name="debug_stat_step_event" translatable="false">Step Counter event saved</string>
+    <string name="debug_stat_pressure_old" translatable="false">No actual pressure value, putting additional task in queue 2 seconds later</string>
     <string name="out_stat_listlength">"List length: "</string>
     <string name="out_stat_pressure">"Pressure: "</string>
     <string name="out_stat_referenceheight">"Reference height: "</string>
-    <string name="save_detail_headline">system time (correlation); step sensor time; steps; stepstotal; pressure time; pressure; height; reference height; reference height timestamp; accumulated height\n</string>
     <string name="notification_text">Step and Height Sensor is counting.</string>
     <string name="no_values">no values</string>
-    <string name="debug_stat_wakeup_alarm">wake up from alarm</string>
+    <string name="debug_stat_wakeup_alarm" translatable="false">wake up from alarm</string>
     <string name="steps">Steps</string>
     <string name="height_actual">Height actual</string>
     <string name="height_m">height [m]</string>
     <string name="height_init1">999 m</string>
-    <string name="zero">0</string>
+    <string name="zero" translatable="false">0</string>
     <string name="height_accumulated">Elevation gain</string>
-    <string name="zero_m">0 m</string>
+    <string name="zero_m" translatable="false">0 m</string>
     <string name="no_data">No data</string>
     <string name="stop_service_notice">Disable notification.\nApp has to be restarted. \nAll unsaved data will be lost!</string>
     <string name="button_stop_service">Stop Service</string>
@@ -40,7 +39,7 @@
     <string name="pref_sum_debug">Lots of unusable data written to SD Card. Data will clog up your space and will not be cleaned up.</string>
     <string name="title_activity_settings">Settings</string>
     <string name="step_is_counting">Step and Height Sensor is counting.</string>
-    <string name="debug_listener_started">Sensor listener started.</string>
+    <string name="debug_listener_started" translatable="false">Sensor listener started.</string>
     <string name="running">running</string>
     <string name="stepsensor_not_activated">Step sensor cannot be activated!</string>
     <string name="pref_title_stat_detail">Detailed statistics</string>
@@ -73,6 +72,17 @@
     <string name="height">Height</string>
     <string name="pref_cat_target">Daily target values</string>
     <string name="pref_stat_detail_multi_title">Detailed statistics</string>
-    <string name="pref_stat_detail_multi_summary">Save every step sensor event or special events with according step values and elevation gain. One file per day.</string>
+    <string name="pref_stat_detail_multi_summary">Save different events. One file per day.</string>
+    <string name="pref_stat_detail_multi_dialog_title">What to save</string>
+    <string name="pref_stat_detail_marker">Marker</string>
+    <string name="pref_stat_detail_start">Start measurement</string>
+    <string name="pref_stat_detail_steps">Every step sensor event</string>
+    <string name="pref_stat_detail_stop">Stop measurement</string>
+    <string name="save_stat_headline_height">Time, timezone, steps, elevation gain, height, entry type\n</string>
+    <string name="save_stat_headline">"Time, timezone, steps, elevation gain, entry type "</string>
+    <string name="stat_type_reset_before">Before reset</string>
+    <string name="stat_type_calibration_before">Before calibration</string>
+    <string name="stat_type_calibration_after">After calibration</string>
+    <string name="stat_type_reset_after">After reset</string>
 
 </resources>

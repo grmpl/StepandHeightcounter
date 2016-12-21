@@ -17,25 +17,18 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
-// only used for idleMessages
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 import static grmpl.mk.stepandheightcounter.Constants.*;
 import static java.lang.Math.pow;
 
-
-
-/* Todo: Evaluate MultiSelectListPreference for saving preferences 
-          Set stringset = getStringseet(key,default)
-          for(String s:  stringset ) { doSomethingWithString(s); }
-   Todo: Save height in detailed statistics -> calibrate-event, too
-i*/
 
 public class SensorService extends Service {
 
@@ -49,7 +42,7 @@ public class SensorService extends Service {
     private float[]       mStepsCumul = {0,-1,-1}; // 0: detail, 1: regulary, 2: daily
     private float         mStepsSensBefore = 0;
     // atmospheric pressure, mpressure is initialized negative!
-    private float         mPressure = -1, mPressureTemporary = 0, mPressureZ = mPRESSURE_SEA;
+    private float         mPressure = -1, mPressureTemporary = 0, mPressureZ = cPRESSURE_SEA;
     private int           mPressCount = 0;
     // for measuring the settling time of pressure sensor
     private long          mPressStartTimestamp = 0; //nanoseconds
@@ -59,7 +52,7 @@ public class SensorService extends Service {
     private float         mHeightBefore = 0;
     // Reference height
     private long          mHeightRefTimestamp = 0;  //nanoseconds
-    private float         mHeightRef = mINIT_HEIGHT_REF;
+    private float         mHeightRef = cINIT_HEIGHT_REF;
 
     // timestamp of sensor events (nanoseconds!)
     private long mEvtTimestampMilliSec = 0; // we only need one timestamp for all *Cumul-values
@@ -130,10 +123,10 @@ public class SensorService extends Service {
             // Correlation timestamp
             outline = sdformati.format(System.currentTimeMillis()) + ";";
             // Step event timestamp translated to real time
-            outline = outline + sdformati.format(steptimestamp/ mNANO_IN_MILLISECONDS + mTimestampDeltaMilliSec) + ";";
+            outline = outline + sdformati.format(steptimestamp/ cNANO_IN_MILLISECONDS + mTimestampDeltaMilliSec) + ";";
             outline = outline + String.format(Locale.US,"%.3f; %.0f; %.0f; %.3f; %.3f; %.2f; %.3f; %.2f; %.2f \n",
-                    (float)steptimestamp/ mNANO_IN_SECONDS,mStepsCumul[0],stepstotal,(float)pressuretimestamp/ mNANO_IN_SECONDS,pressure,height,
-                    (float)mHeightRefTimestamp/ mNANO_IN_SECONDS,mHeightRef,mHeightCumul[0]);
+                    (float)steptimestamp/ cNANO_IN_SECONDS,mStepsCumul[0],stepstotal,(float)pressuretimestamp/ cNANO_IN_SECONDS,pressure,height,
+                    (float)mHeightRefTimestamp/ cNANO_IN_SECONDS,mHeightRef,mHeightCumul[0]);
             return outline;
         }
     }
@@ -171,9 +164,6 @@ public class SensorService extends Service {
         mBarometer = mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE,false);
         // Significant motion - only this one does have a wakeup type
         mMotion = mSensorManager.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION,true);
-        // only used for idleMessages
-          // get our queue to put own messages in it
-          // mQueue = Looper.myQueue();
         // create an Alarm receiver
         mAlarm = new AlarmReceiver();
         // to save our data to disk
@@ -196,35 +186,34 @@ public class SensorService extends Service {
         return mBinder;
     }
 
-    // ** Star/Stop measuring **
+    // ** Start/Stop measuring **
     public boolean startListeners() {
         mSave.saveDebugStatus("Start measurement requested");
         if (!mRegistered) {
-            // this has to finish, so request a wakelock
+            // this must finish, so request a wakelock
             PowerManager.WakeLock wakelock = mPowerManger.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "START");
-            wakelock.acquire(mWAKELOCK_ALARM); //that should be more than enough - we will release it
+            wakelock.acquire(cWAKELOCK_ALARM); //that should be more than enough - we will release it
 
             // Build an intent for starting our MainActivity from notification
             Intent nIntent = new Intent(this, MainActivity.class);
             // this is necessary when activity is started from a service
-            //  we don't need to reuse an existing acitvity, as our activity is stateless
+            //  we don't need to reuse an existing acitvity, as our main activity is stateless
             nIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             // Create pendingIntent which can be given to notification builder
             mPIntentActivity = PendingIntent.getActivity(this, 0, nIntent, 0);
-            // back stack creation is not necessary as we only have one main activity in our app
-            //  and I don't know if this is possible from service
+            // back stack creation seems not to be necessary (would it even be possible from service?)
             Notification noti = new Notification.Builder(this)
                     .setSmallIcon(R.drawable.ic_walkinsteps)
                     .setContentTitle(getString(R.string.app_name))
                     .setContentText(getString(R.string.step_is_counting))
                     .setContentIntent(mPIntentActivity)
                     .build();
-            startForeground(mNOTIID, noti);
+            startForeground(cNOTIID, noti);
 
             // Check, if we have statistic data from previous run to save
-            periodicStatistics(System.currentTimeMillis(),mNOTRUNNING);
+            periodicStatistics(System.currentTimeMillis(),cNOTRUNNING);
 
-            // if there was no measurement in this intervall, cumul-values will be set to -1
+            // if there was no measurement in this periodic intervall, cumul-values will be set to -1
             if (mHeightCumul[1] < 0) mHeightCumul[1] = 0;
             if (mHeightCumul[2] < 0) mHeightCumul[2] = 0;
             if (mStepsCumul[1] < 0) mStepsCumul[1] = 0;
@@ -233,8 +222,8 @@ public class SensorService extends Service {
             savePersistent();
 
 
-            if (mSettings.getBoolean(mPREF_STAT_DETAIL, false))
-            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], mSTAT_TYPE_START);
+            if (getDetailSave("a"))
+            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), cSTAT_TYPE_START);
 
             mAlarm.setAlarm(this);
 
@@ -250,7 +239,7 @@ public class SensorService extends Service {
             if (wakelock.isHeld()) wakelock.release();
             return succ;
         }
-        // if we are registered, we don't have to do anything
+        // if we are already registered to sensors, we don't have to do anything
         else return true;
     }
 
@@ -264,8 +253,8 @@ public class SensorService extends Service {
         // make sure we have all work done
         correlateSensorEvents();
 
-        if (mSettings.getBoolean(mPREF_STAT_DETAIL, false))
-            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], mSTAT_TYPE_STOP);
+        if (getDetailSave("o"))
+            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), cSTAT_TYPE_STOP);
 
 
         //reset array
@@ -276,12 +265,12 @@ public class SensorService extends Service {
         mStepsSensBefore = 0;
 
         //reset pressure values
-        mPressure = -1; //settling and calibration has to be done again
+        mPressure = -1; //sensor settling and calibration has to be done again
         mPressStartTimestamp = 0; // pressure sensor will start anew
         mTimestampDeltaMilliSec = 0; // shouldn't be necessary, just make sure
 
         //after restart height reference will not be valid anymore
-        mHeightRef = mINIT_HEIGHT_REF;
+        mHeightRef = cINIT_HEIGHT_REF;
 
 
         mAlarm.cancelAlarm(this);
@@ -298,8 +287,14 @@ public class SensorService extends Service {
     // ** most important method **
 
     /*
+       Correlation: Loop over all outstanding step sensor events, correlate them with a pressure event,
+        calculate elevation gain and save it.
+        As we should have exact one handler for every array element, it should be sufficient
+        to handle only one step sensor event, but messages could be lost and it should be more
+        efficient to handle all outstanding events in one go, so we are looping.
+
        The correlation of stepsensor events and pressuresensor events must be done after all
-        outstanding sensor events have been processed. Ohterwise there could still be pressure events
+        outstanding sensor events have been processed. Otherwise there could still be pressure events
         waiting, although all step events have been processed.
        Just calling the correlation process from step sensor does not work, because you don't get
         actual pressure values (still waiting to be processed).
@@ -308,7 +303,7 @@ public class SensorService extends Service {
         wakeup-situations and there seems to be no way to change this. So this does only work
         reliably with a constant wakelock.
        Just posting a runnable into the message-queue should put it in the end of the queue. But
-        as it happens, there will still be outstanding pressure events. Maybe because of delayed
+        as it happens, there could still be outstanding pressure events. Maybe because of delayed
         delivery from the sensor (maxdelay of pressure sensor is up to 10 seconds and the flush-method
         is asynchronous!), maybe it's my batch-processing of all outstanding events (but already
         the first step events has a problem with delayed pressure events), maybe I'm just missing
@@ -317,14 +312,8 @@ public class SensorService extends Service {
         pressure and wait for delivery.
      */
     private boolean correlateSensorEvents() {
-        // loop over all outstanding step sensor events, correlate them with a pressure event,
-        //  calculate elevation gain and save it.
-        // as we should have exact one handler for every array element, it should be sufficient
-        //  to handle only one step sensor event, but messages could be lost and it should be more
-        //  efficient to handle all outstanding events in one go, so we are looping.
-
-        // save actual size in variable, so that it can't be changed by an async operation
-        //  (we don't have an async operation yet, but just to be sure)
+        // save actual size of list in variable, just to be sure it wouldn't be changed
+        //  (shouldn't be necessary, but could be with async processing)
         int limit = mStepHistoryList.size(), calcindex;
         mSave.saveDebugStatus("correlation started");
 
@@ -346,14 +335,14 @@ public class SensorService extends Service {
                     public void run() {
                         correlateSensorEvents();
                     }
-                }, mDELAY_CORRELATION);
-                // Stop looping over step events
+                }, cDELAY_CORRELATION);
+                // Stop looping over step events, wouldn't make sense
                 break;
             }
 
 
             // find pressure for my timestamp, timestamp is sorted, so we can make a binary search
-            //  I haven't checked it out: it's a sample code from stackoverflow
+            //  (this is a sample code from stackoverflow)
             while (lowindex <= highindex) {
                 midindex = (lowindex + highindex) / 2;
                 lasttimestamp = mPressureHistoryList.get(midindex).timestamp;
@@ -365,8 +354,8 @@ public class SensorService extends Service {
             }
 
             // if pressure values are valid, we check if statistic data has to be saved
-            periodicStatistics(values.steptimestamp / mNANO_IN_MILLISECONDS
-                    + mTimestampDeltaMilliSec,mISRUNNING);
+            periodicStatistics(values.steptimestamp / cNANO_IN_MILLISECONDS
+                    + mTimestampDeltaMilliSec, cISRUNNING);
             //  and afterwards we can delete our list entry (FIFO)
             //   we delete it here, because better it doesn't get counted, than counted twice
             mStepHistoryList.remove(0);
@@ -378,9 +367,6 @@ public class SensorService extends Service {
             long pressuretimestamp = mPressureHistoryList.get(midindex).timestamp;
 
             // Now we can calculate our height
-            //According to Wikipedia this is the "official" international hypsometric formula
-            // on http://keisan.casio.com/ there is a similar, but different formula
-            // I don't know which is the better one.
             float height = calcHeight(pressure);
 
             if (mStepValuesCorrBefore == null) {  //no beforevalues yet: init and pause
@@ -395,23 +381,23 @@ public class SensorService extends Service {
                             mStepsCumul[i] + values.stepstotal - mStepValuesCorrBefore.stepstotal;
                 }
                 // and timestamp for event (we will only need msec in Unix time)
-                mEvtTimestampMilliSec = values.steptimestamp / mNANO_IN_MILLISECONDS + mTimestampDeltaMilliSec;
+                mEvtTimestampMilliSec = values.steptimestamp / cNANO_IN_MILLISECONDS + mTimestampDeltaMilliSec;
 
                 // then check if we have height to count
-                // If steps take longer than 5 seconds, assume we do not walk,
-                // or if we are ascending too fast
-                // or mHeightRef was resetted just now
-                // just save height as new reference and don't count it
+                // If steps take longer than 5 seconds (no walking, pausing, driving, ...)
+                // or if we are ascending too fast,
+                // or mHeightRef was resetted just now,
+                // we just save height as new reference and don't count it for elevation gain
 
                 if ( ( (values.steptimestamp - mStepValuesCorrBefore.steptimestamp)
                            / (values.stepstotal - mStepValuesCorrBefore.stepstotal)
-                           > mMAX_STEP_DURATION * mNANO_IN_SECONDS
+                           > cMAX_STEP_DURATION * cNANO_IN_SECONDS
                      ) ||
                      ( (height - mHeightBefore)
                            / (values.steptimestamp - mStepValuesCorrBefore.steptimestamp)
-                           > mMAX_ELEV_GAIN
+                           > cMAX_ELEV_GAIN
                      ) ||
-                     ( mHeightRef <= mINIT_HEIGHT_REF )
+                     ( mHeightRef <= cINIT_HEIGHT_REF )
                    ) {
                        mHeightRef = height;
                        mHeightRefTimestamp = values.steptimestamp;
@@ -432,7 +418,7 @@ public class SensorService extends Service {
                         //         (please note: slow descending should also lead to new reference height only, if 1 minute has passed
                         //                       so -1 for second comparison is correct, not 0
                         //  note: timestamp is nanoseconds
-                        if (((values.steptimestamp - mHeightRefTimestamp) > mMAX_DURATION_1M * mNANO_IN_SECONDS)
+                        if (((values.steptimestamp - mHeightRefTimestamp) > cMAX_DURATION_1M * cNANO_IN_SECONDS)
                                 || ((height - mHeightRef) <= -1)) {
                             mHeightRef = height;
                             mHeightRefTimestamp = values.steptimestamp;
@@ -450,12 +436,12 @@ public class SensorService extends Service {
             // ** Update activity, notification, debug-information and persistent values **
             savePersistent();
 
-            if (mSettings.getBoolean(mPREF_DEBUG, false)) mSave.saveDebugValues(
+            if (mSettings.getBoolean(cPREF_DEBUG, false)) mSave.saveDebugValues(
                     values.printdebug(pressure, pressuretimestamp, height));
 
-            if (mSettings.getBoolean(mPREF_STAT_DETAIL, false))
+            if (getDetailSave("e"))
                 mSave.saveStatistics(mEvtTimestampMilliSec,
-                        mStepsCumul[0], mHeightCumul[0], mSTAT_TYPE_SENS);
+                        mStepsCumul[0], mHeightCumul[0], height, cSTAT_TYPE_SENS);
 
             // Update Notification, put actual values in it
             Notification noti = new Notification.Builder(this)
@@ -467,13 +453,13 @@ public class SensorService extends Service {
                             + String.format(Locale.getDefault(), "%.1f", mHeightCumul[0]))
                     .setContentIntent(mPIntentActivity)
                     .build();
-            mNotificationManager.notify(mNOTIID, noti);
+            mNotificationManager.notify(cNOTIID, noti);
 
 
             // Callback to MainActivity
             Intent callback = new Intent();
             callback.setAction("grmpl.mk.stepandheighcounter.custom.intent.Callback");
-            if (mSettings.getBoolean(mPREF_DEBUG, false)) {
+            if (mSettings.getBoolean(cPREF_DEBUG, false)) {
                 String outtext = getString(R.string.out_stat_listlength) + Integer.toString(mStepHistoryList.size()) + "\n";
                 outtext = outtext + getString(R.string.out_stat_pressure) + Float.toString(pressure) + "\n";
                 outtext = outtext + getString(R.string.out_stat_referenceheight) + Float.toString(mHeightRef) + "\n";
@@ -497,11 +483,8 @@ public class SensorService extends Service {
                 get lost (I've seen this after some hours of running).
                 As there is no easy way to check if we are already registered, it's better just
                 to register again.
-                Maybe there are better places:
-                  - Alarmreceiver: would have to make it non-static
-                  - StepSensorListener: it is called as often as idleHandler
-
-                Update: Just register again doesn't help - maybe unregister and reregister?
+                Just register again doesn't help - maybe unregister and reregister does the trick.
+                (haven't checked in detail)
              */
 
         mSensorManager.cancelTriggerSensor(mMotionListener, mMotion);
@@ -519,9 +502,9 @@ public class SensorService extends Service {
         @Override
         public void onTrigger(TriggerEvent triggerEvent) {
             PowerManager.WakeLock wakelock;
-            // do nothing, just acquire wakelock to let sensor events happen
+            // do nothing, just acquire wakelock to let sensor events come through
             wakelock = mPowerManger.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SIGNIFICANT_MOTION");
-            wakelock.acquire(mWAKELOCK_TRIGGER); //acquire for 30sec - this should not be a single move
+            wakelock.acquire(cWAKELOCK_TRIGGER); //acquire for 30sec - this should not be a single move only
             mSave.saveDebugStatus("Wake up from trigger");
             mSensorManager.flush(mSensorBarListener);
             mSensorManager.flush(mSensorStepListener);
@@ -529,7 +512,7 @@ public class SensorService extends Service {
             mSensorManager.requestTriggerSensor(mMotionListener,mMotion);
             mSave.saveDebugStatus("Register to significant motion sensor from trigger");
             // unfortunately, trigger seems to be lost after some hours of operation,
-            // so we register after every correlation, too
+            // so we register after every correlation, too (see above)
         }
     };
 
@@ -544,14 +527,14 @@ public class SensorService extends Service {
                 if (mPressStartTimestamp == 0){
                     // get a wakelock, we have to finish this
                     mWakelockSettle = mPowerManger.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"SENSOR_SETTLE");
-                    mWakelockSettle.acquire(mWAKELOCK_SETTLE_PRESSURE);
+                    mWakelockSettle.acquire(cWAKELOCK_SETTLE_PRESSURE);
                     mSave.saveDebugStatus("First pressure value, waiting 1 sec for sensor to settle down");
                     mPressStartTimestamp = sensorEvent.timestamp;
                     // calculate first timestampdelta
                     mTimestampDeltaMilliSec = System.currentTimeMillis()-(sensorEvent.timestamp / 1000000);
                 }
                 // settling time
-                else if (sensorEvent.timestamp-mPressStartTimestamp < mPRESSURE_SETTLE_DURATION) {
+                else if (sensorEvent.timestamp-mPressStartTimestamp < cPRESSURE_SETTLE_DURATION) {
                     // do nothing, just adjust timestampdelta
                     long tsdelta = System.currentTimeMillis()-(sensorEvent.timestamp / 1000000);
                     // timestampdelta must be positive (current time must be more than sensor timestamp)
@@ -579,20 +562,19 @@ public class SensorService extends Service {
             } else {
                 // We average over 5 values, this would be ~1sec
                 mPressureTemporary = mPressureTemporary + sensorEvent.values[0];
-                if (mPressCount == (mPRESSURE_AVG_COUNT - 1)) {
-                    // mPressure is just the last valid average over 5(10) pressure values
+                if (mPressCount == (cPRESSURE_AVG_COUNT - 1)) {
+                    // mPressure is just the last valid average over 5 pressure values
                     //  if there is a problem with getting pressure values, we won't notice
-                    mPressure = mPressureTemporary / mPRESSURE_AVG_COUNT;
+                    mPressure = mPressureTemporary / cPRESSURE_AVG_COUNT;
                     // check if calibration is needed
                     if(mCalibrationHeight != 0) calibrateHeight(mCalibrationHeight);
 
-                    // remember the last 200 values of pressure
+                    // remember the last 400 values of pressure
                     mPressureHistory pressure = new mPressureHistory(mPressure, sensorEvent.timestamp);
                     mPressureHistoryList.add(pressure);
-                    // we should afford 400 values as binary search is fast
-                    if (mPressureHistoryList.size() > mMAX_PRESSURE_SAVE)
+                    if (mPressureHistoryList.size() > cMAX_PRESSURE_SAVE)
                         mPressureHistoryList.remove(0);
-                    if(mSettings.getBoolean(mPREF_DEBUG,false)){
+                    if(mSettings.getBoolean(cPREF_DEBUG,false)){
                         mSave.saveDebugStatus(
                                 String.format(Locale.US, "Pressure value %.2f saved, listsize: %d",
                                         mPressure,mPressureHistoryList.size())
@@ -628,36 +610,32 @@ public class SensorService extends Service {
                 mStepsSensBefore = stepsact;
                 mStepSensorValues data = new mStepSensorValues(steptimestamp, stepsact);
                 mStepHistoryList.add(data);
-                // Try it with posting a normal runnable in the queue instead of idleHandler
-                // mQueue.addIdleHandler(mIdleHandler);
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         correlateSensorEvents();
                     }
-                }, mDELAY_CORRELATION_FIRST);
+                },cDELAY_CORRELATION_FIRST);
                 mSave.saveDebugStatus("Step Counter init.");
             }
             /*
             Counted reading
              (sensor is counting total steps, so we don't have to care about every single step)
             */
-            else if ((stepsact - mStepsSensBefore) > mMIN_STEPS_DELTA) {
+            else if ((stepsact - mStepsSensBefore) >cMIN_STEPS_DELTA) {
                 // just save the data
                 mStepSensorValues data = new mStepSensorValues(steptimestamp, stepsact);
                 mStepHistoryList.add(data);
                 // and remember it for next check
                 mStepsSensBefore = stepsact;
-                // Try it with posting a normal runnable in the queue instead of idleHandler
-                // mQueue.addIdleHandler(mIdleHandler);
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         correlateSensorEvents();
                     }
-                }, mDELAY_CORRELATION_FIRST);
+                },cDELAY_CORRELATION_FIRST);
 
                 mSave.saveDebugStatus("Step Counter event saved");
             }
@@ -670,6 +648,9 @@ public class SensorService extends Service {
     public void calibrateHeight(float cHeight){
         // if pressure is already measured, calculate sea level pressure from actual pressure
         if (mPressure > 0) {
+            if (getDetailSave("c"))
+                mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), getString(R.string.stat_type_calibration_before));
+
             // get pressure of height reference (saving it would be more difficult than reextracting
             //   as calibration would be done seldom)
             double heightrefpressure = mPressureZ * pow(1-(cHeight * 0.0065 / 288.15),5.255);
@@ -682,30 +663,40 @@ public class SensorService extends Service {
             editpref.apply();
             // calibration done, temporary value must be cleared
             mCalibrationHeight = 0;
+            if (getDetailSave("c"))
+                mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), getString(R.string.stat_type_calibration_after));
+
         }
         // if there is no pressure yet, save value for later calibration
         else mCalibrationHeight = cHeight;
     }
 
     public void resetData() {
+        if (getDetailSave("r"))
+            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), getString(R.string.stat_type_reset_before) );
         mStepsCumul[0] = 0;
-        mPressureZ = mPRESSURE_SEA;
-        mHeightRef = mINIT_HEIGHT_REF; // 0 as init-value would not work at sea
+        mPressureZ = cPRESSURE_SEA;
+        mHeightRef = cINIT_HEIGHT_REF; // 0 as init-value would not work at sea
         mHeightCumul[0] = 0;
         savePersistent();
-        if (mSettings.getBoolean(mPREF_STAT_DETAIL, false))
-            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], mSTAT_TYPE_RESET);
+        if (getDetailSave("r"))
+            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), getString(R.string.stat_type_reset_after) );
     }
 
     public void getValues() {
         // if we are measuring, update statistic values
-        if (mRegistered) periodicStatistics(System.currentTimeMillis(),mISRUNNING);
-        else periodicStatistics(System.currentTimeMillis(),mNOTRUNNING);
+        if (mRegistered) periodicStatistics(System.currentTimeMillis(),cISRUNNING);
+        else periodicStatistics(System.currentTimeMillis(),cNOTRUNNING);
 
         Intent callback = new Intent();
         callback.setAction("grmpl.mk.stepandheighcounter.custom.intent.Callback");
 
-        callback.putExtra("Status"," ");
+        if (mSettings.getBoolean(cPREF_DEBUG, false)) {
+            String outtext = getString(R.string.out_stat_listlength) + Integer.toString(mStepHistoryList.size()) + "\n";
+            outtext = outtext + getString(R.string.out_stat_pressure) + Float.toString(mPressure) + "\n";
+            outtext = outtext + getString(R.string.out_stat_referenceheight) + Float.toString(mHeightRef) + "\n";
+            callback.putExtra("Status", outtext);
+        } else callback.putExtra("Status", " ");
         callback.putExtra("Steps",mStepsCumul[0]);
         callback.putExtra("Height",getHeight());
         callback.putExtra("Heightacc",mHeightCumul[0]);
@@ -716,6 +707,16 @@ public class SensorService extends Service {
         sendBroadcast(callback);
     }
 
+    boolean getDetailSave(String identifier){
+        Set<String> detail_multi = mSettings.getStringSet(cPREF_STAT_DETAIL_MULTI, cPREF_STAT_DETAIL_MULTI_DEFAULT);
+
+        for (String s:  detail_multi ) {
+            if ( s.equals(identifier) ) return true;
+        }
+
+        return false;
+    }
+
     float getHeight(){
 
         if (mPressure <= 0) return 9998F; // no measurement yet
@@ -723,6 +724,9 @@ public class SensorService extends Service {
     }
 
     float calcHeight(float pressure){
+        //According to Wikipedia this is the "official" international hypsometric formula
+        // on http://keisan.casio.com/ there is a similar, but different formula
+        // I don't know which is the better one.
         return (float) ((1 - pow((pressure / mPressureZ), (1 / 5.255))) * 288.15 / 0.0065);
     }
 
@@ -748,7 +752,7 @@ public class SensorService extends Service {
             mHeightCumul[i]  = mSettings.getFloat("mHeightCumul" + i, 0);
         }
         mEvtTimestampMilliSec = mSettings.getLong("mEvtTimestampMilliSec", 0);
-        mPressureZ = mSettings.getFloat("mPressureZ", mPRESSURE_SEA);
+        mPressureZ = mSettings.getFloat("mPressureZ", cPRESSURE_SEA);
     }
 
     void periodicStatistics(long acttimestamp_msec, int running){  //acttimestamp in milliseconds
@@ -778,13 +782,13 @@ public class SensorService extends Service {
         //    if not, we don't have to care for all the other checks and just do nothing
         //    (shortest interval is 15 minutes, all intervals are aligned to 15 minutes)
 
-        if( mEvtTimestampMilliSec > mMILLISECONDS_IN_YEAR &&  // plausibility: mEvtTimestampMilliSec should be at least in 1971
+        if( mEvtTimestampMilliSec > cMILLISECONDS_IN_YEAR &&  // plausibility: mEvtTimestampMilliSec should be at least in 1971
                 (mEvtTimestampMilliSec / (15 * 60 * 1000) < acttimestamp_msec / (15 * 60 * 1000))) {
             // Do we have to save regular statistics?
-            if (mSettings.getBoolean(mPREF_STAT_HOUR, false)){
+            if (mSettings.getBoolean(cPREF_STAT_HOUR, false)){
                 // get the interval duration for regular statistics
                 //  int would be enough, but careful casting would be necessary
-                long interval_msec = Integer.valueOf(mSettings.getString(mPREF_STAT_HOUR_MIN, "30")) * 60 * 1000;
+                long interval_msec = Integer.valueOf(mSettings.getString(cPREF_STAT_HOUR_MIN, "30")) * 60 * 1000;
                 long evtint = mEvtTimestampMilliSec / interval_msec; // integer-division: correct sequence is necessary!
                 long currint = acttimestamp_msec / interval_msec;
                 // if we have values from previous interval, last interval is finished, we can save them
@@ -793,26 +797,25 @@ public class SensorService extends Service {
                     //  drawback: last interval of day is saved at next day 0:00
                     //    solution: check in save-method for 0:00 and save it as 24:00
                     mSave.saveStatistics( (evtint + 1) * interval_msec,
-                            mStepsCumul[1],mHeightCumul[1],mSTAT_TYPE_REGULAR);
+                            mStepsCumul[1],mHeightCumul[1],cSTAT_TYPE_REGULAR);
                     mStepsCumul[1] = running;  // method can be called even if measurement is not running
                     mHeightCumul[1] = running; // so we have to save actual state
                     // set evttimestamp, otherwise this function will be called repeatedly until next event (steps!) is saved
-                    //  this should give always correct results as long as regular intervals are an integral divisor of day
+                    //  please note: regular intervals have to be a integral divisor of day, otherwise we would need two different
+                    //              event timestamps
                     setevttimestamp = true;
-                    // fill up all intervals without values (here too: timestamp is at the end of the interval)
+                    // fill up all intervals without values, but limit it to 100 entries
+                    //   otherwise we could write lots of data if app was not used for a long time.
                     // 100 lines did not give a delay at start when tested and would be enough for one day.
-                    // this would be the simplest method
-                    // if (currint - evtint > 100) evtint = currint-100;
-                    // and this will only fill up the file of the current day:
                     if (currint - evtint > 100) evtint = ( 24*60*60*1000 * ( acttimestamp_msec/(24 * 60 * 60 * 1000) )
                             - tz.getOffset(acttimestamp_msec) ) / interval_msec - 1 ;
                     for (long l = evtint + 2; l <= currint; l++)
-                        mSave.saveStatistics( l * interval_msec, running, running, mSTAT_TYPE_REGULAR);
+                        mSave.saveStatistics( l * interval_msec, running, running,cSTAT_TYPE_REGULAR);
                 }
                 //else nothing to do
             }
             // do we have to save daily statistics?
-            if (mSettings.getBoolean(mPREF_STAT_DAILY, false)){
+            if (mSettings.getBoolean(cPREF_STAT_DAILY, false)){
                 // get the interval duration for regular statistics
                 long interval_msec = 24 * 60 * 60 * 1000;//24h hours
                 // We calculate our days based on current timezone:
@@ -823,14 +826,14 @@ public class SensorService extends Service {
                     // as our days are UTC-days ( integer * 24h ), we have to correct the timestamps with timezone-information
                     //   timestamp for saving would be 0:00
                     mSave.saveStatistics( evtint * interval_msec - tz.getOffset(mEvtTimestampMilliSec),
-                            mStepsCumul[2],mHeightCumul[2],mSTAT_TYPE_DAILY);
+                            mStepsCumul[2],mHeightCumul[2],cSTAT_TYPE_DAILY);
                     mStepsCumul[2] = running;  //see above
                     mHeightCumul[2] = running; //see above
                     setevttimestamp = true;
                     // fill up all intervals without values, but not more than one week
                     if (currint - evtint > 8) evtint = currint - 8;
                     for (long l = evtint + 1; l < currint; l++)
-                        mSave.saveStatistics( l * interval_msec - tz.getOffset(mEvtTimestampMilliSec), running, running, mSTAT_TYPE_DAILY);
+                        mSave.saveStatistics( l * interval_msec - tz.getOffset(mEvtTimestampMilliSec), running, running, cSTAT_TYPE_DAILY);
                 }
                 //else nothing to do
             }
@@ -855,6 +858,4 @@ public class SensorService extends Service {
 
         super.onDestroy();
     }
-
 }
-

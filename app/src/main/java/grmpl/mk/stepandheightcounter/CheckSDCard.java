@@ -1,7 +1,6 @@
 package grmpl.mk.stepandheightcounter;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -10,8 +9,8 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 
 
+// checking write access to SD-Card
 class CheckSDCard {
-
     // variable to hold context
     private Context mContext;
 
@@ -35,7 +34,6 @@ class CheckSDCard {
             editpref.putBoolean("mReqSDPermission",true);
             editpref.apply();
         }
-
         return mExternalStorageWriteable;
     }
 }
