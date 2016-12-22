@@ -1,8 +1,12 @@
 package grmpl.mk.stepandheightcounter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
+import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
+import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
 import java.io.File;
@@ -38,8 +42,7 @@ class SaveData {
             if (settings.getBoolean(cPREF_DEBUG, false)) {
                 SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
                 Date actualdate = new Date(System.currentTimeMillis());
-                String directoryname = Environment.getExternalStorageDirectory() + File.separator + cDIRECTORY;
-                File directory = new File(directoryname);
+                File directory = getDirectory();
 
                 if (!directory.exists()) {
                     if (!directory.mkdirs()) {
@@ -82,10 +85,7 @@ class SaveData {
             //Save data to file
             SimpleDateFormat sdformat = new SimpleDateFormat("yyyyMMdd", Locale.US);
             Date actualdate = new Date(System.currentTimeMillis());
-            String directoryname = Environment.getExternalStorageDirectory() + File.separator + cDIRECTORY;
-
-
-            File directory = new File(directoryname);
+            File directory = getDirectory();
             if (!directory.exists()) {
                 if (!directory.mkdirs()) {
                     return -1;
@@ -143,13 +143,13 @@ class SaveData {
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
             boolean autoclean;
             int keep;
+
             //Save data to file
             switch (type) {
                 // For daily statistics
                 case cSTAT_TYPE_DAILY:
                     sdformat = new SimpleDateFormat("yyyy", Locale.US);
                     sdformati = new SimpleDateFormat("yyyy-MM-dd, zzz", Locale.US); // fixed formatting, not local formatting, day is enough
-                    filenamet = cFILENAME_STAT_DAILY;
                     autoclean = false;
                     keep = 9999;
                     break;
@@ -157,10 +157,8 @@ class SaveData {
                 case cSTAT_TYPE_REGULAR:
                     sdformat = new SimpleDateFormat("yyyyMMdd", Locale.US);
                     sdformati = new SimpleDateFormat("yyyy-MM-dd HH:mm, zzz", Locale.US); //seconds not needed
-                    filenamet = cFILENAME_STAT_REG;
                     autoclean = settings.getBoolean(cPREF_STAT_HOUR_CLEAR, false);
-                    keep = Integer.valueOf(
-                            settings.getString(cPREF_STAT_HOUR_CLEAR_NUM, "9999"));
+                    keep = Integer.valueOf(settings.getString(cPREF_STAT_HOUR_CLEAR_NUM, "9999"));
                     // to save the last interval not at next day 0:00, but on this day 24:00 we adjust the time a little bit
                     timems = timems - 1;
                     break;
@@ -168,19 +166,13 @@ class SaveData {
                 default:
                     sdformat = new SimpleDateFormat("yyyyMMdd", Locale.US);
                     sdformati = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss, zzz", Locale.US); // fixed formatting, not local formatting
-                    filenamet = cFILENAME_STAT_DETAIL;
                     autoclean = settings.getBoolean(cPREF_STAT_DETAIL_CLEAR, false);
-                    keep = Integer.valueOf(
-                            settings.getString(cPREF_STAT_DETAIL_CLEAR_NUM, "9999"));
+                    keep = Integer.valueOf(settings.getString(cPREF_STAT_DETAIL_CLEAR_NUM, "9999"));
             }
 
-            // Always keep one file, even if check in settings went wrong
-            if (keep < 1) keep = 1;
+            filenamet = getFilenameEnding(type);
+            File directory = getDirectory();
 
-            String directoryname = Environment.getExternalStorageDirectory() + File.separator + cDIRECTORY;
-
-
-            File directory = new File(directoryname);
             if (!directory.exists()) {
                 if (!directory.mkdirs()) {
                     return -1;
@@ -218,19 +210,7 @@ class SaveData {
 
                     // Delete old files
                     if (autoclean) {
-                        File[] filelist = directory.listFiles(new FilenameFilter() {
-                            @Override
-                            public boolean accept(File file, String s) {
-                                return s.contains(filenamet);
-                            }
-                        });
-                        int deletefiles = filelist.length - keep;
-                        if (deletefiles > 0) {
-                            Arrays.sort(filelist);
-                            for (int i = 0; i < deletefiles; i++) {
-                                if (!filelist[i].delete() ) saveDebugStatus("File delete failed.");
-                            }
-                        }
+                        deleteFiles(type,keep);
                     }
                 } else {
                     out = new FileOutputStream(file, true);
@@ -252,6 +232,100 @@ class SaveData {
             }
         }
         else return -3;
+    }
+
+    // If AlertDialog was ended with "Yes", we set the Checkbox for Autoclean and delete old files
+    void saveClearOnAndDelete(String type, PreferenceFragment fragment){
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+        int keep;
+        switch (type) {
+            // For daily statistics - shouldn't happen!
+            case cSTAT_TYPE_DAILY:
+                saveDebugStatus("Wrong type");
+                break;
+            // for regular statistics
+            case cSTAT_TYPE_REGULAR:
+                keep = Integer.valueOf(settings.getString(cPREF_STAT_HOUR_CLEAR_NUM, "9999"));
+                // We got the fragment, so we can change the preference directly
+                CheckBoxPreference box1 = (CheckBoxPreference) fragment.findPreference(cPREF_STAT_HOUR_CLEAR);
+                box1.setChecked(true);
+                deleteFiles(type, keep);
+                break;
+            // for detailed statistics
+            default:
+                keep = Integer.valueOf(settings.getString(cPREF_STAT_DETAIL_CLEAR_NUM, "9999"));
+                // We got the fragment, so we can change the preference directly
+                CheckBoxPreference box2 = (CheckBoxPreference) fragment.findPreference(cPREF_STAT_DETAIL_CLEAR);
+                box2.setChecked(true);
+                deleteFiles(type, keep);
+        }
+
+    }
+
+    // If AlertDialog was ended with "Yes", we set the number for Autoclean as choosen and delete old files
+    void saveNumberAndDelete(String type, int number, PreferenceFragment fragment){
+        switch (type) {
+            // For daily statistics
+            case cSTAT_TYPE_DAILY:
+                saveDebugStatus("Wrong type");
+                break;
+            // for regular statistics
+            case cSTAT_TYPE_REGULAR:
+                // We got the fragment, so we can change the preference directly
+                EditTextPreference text1 = (EditTextPreference) fragment.findPreference(cPREF_STAT_HOUR_CLEAR_NUM);
+                text1.setText(Integer.toString(number));
+                deleteFiles(type,number);
+                break;
+            // for detailed statistics
+            default:
+                // We got the fragment, so we can change the preference directly
+                EditTextPreference text2 = (EditTextPreference) fragment.findPreference(cPREF_STAT_DETAIL_CLEAR_NUM);
+                text2.setText(Integer.toString(number));
+                deleteFiles(type, number);
+        }
+
+    }
+
+
+    // deleting old files
+    private void deleteFiles(String type, int keep){
+        File directory = getDirectory();
+        String filenameend = getFilenameEnding(type);
+
+        // Always keep one file, even if check in settings went wrong
+        if (keep < 1) keep = 1;
+
+        File[] filelist = directory.listFiles((file1, s) -> {
+            return s.contains(filenameend);
+        });
+        int deletefiles = filelist.length - keep;
+        if (deletefiles > 0) {
+            Arrays.sort(filelist);
+            for (int i = 0; i < deletefiles; i++) {
+                if ( !filelist[i].delete() ) saveDebugStatus("File delete failed.");
+            }
+        }
+    }
+
+    // central point for directory
+    private File getDirectory(){
+        String temp =  Environment.getExternalStorageDirectory() + File.separator + cDIRECTORY;
+        return new File(temp);
+    }
+
+    private String getFilenameEnding(String type){
+        switch (type) {
+            // For daily statistics
+            case cSTAT_TYPE_DAILY:
+                return cFILENAME_STAT_DAILY;
+            // for regular statistics
+            case cSTAT_TYPE_REGULAR:
+                return cFILENAME_STAT_REG;
+            // for detailed statistics
+            default:
+                return cFILENAME_STAT_DETAIL;
+        }
+
     }
 
 }

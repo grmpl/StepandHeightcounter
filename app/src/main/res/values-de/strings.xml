@@ -26,7 +26,7 @@
     <string name="height_accumulated">Höhenmeter</string>
     <string name="steps">Schritte</string>
     <string name="stop_service_notice">Hinweis wird wieder ausgeblendet, App muss neu gestartet werden, alle Daten gehen verloren!</string>
-    <string name="pref_sum_debug">Viele unnötige Statusinformationen, die die SD-Karte zumüllen. Wird nicht bereinigt!</string>
+    <string name="pref_sum_debug">Viele unnötige Statusinformationen, die die SD-Karte zumüllen. Wird auch nicht bereinigt!</string>
     <string name="step_is_counting">Schritte und Höhensensor ist aktiv.</string>
     <string name="title_activity_settings">Einstellungen</string>
     <string name="running">läuft</string>
@@ -38,8 +38,8 @@
     <string name="pref_cat_stat">Statistiken</string>
     <string name="pref_cat_stat_det">Detaillierte Statistik</string>
     <string name="text_reset">Schritte und Höhenmeter zurücksetzen.</string>
-    <string name="pref_stat_clear_num_sum">Maximale Anzahl an Dateien. (Änderung wird erst wirksam, wenn die nächste Datei erzeugt wird)</string>
-    <string name="pref_stat_clear_sum">Alte Dateien werden gelöscht. (Änderung wird erst wirksam, wenn die nächste Datei erzeugt wird)</string>
+    <string name="pref_stat_clear_num_sum">Wie viele Dateien sollen jeweils erhalten bleiben?</string>
+    <string name="pref_stat_clear_sum">Alte Dateien werden gelöscht.</string>
     <string name="pref_stat_daily_sum">Jeden Tag werden Schritte und Höhenmeter gespeichert, pro Jahr wird eine Datei erzeugt.\nEs gibt kein automatisches Löschen.</string>
     <string name="pref_stat_hour_min_sum">Intervall für die Speicherung von regelmäßigen Statistiken</string>
     <string name="pref_stat_hour_sum">Schritte und Höhenmeter werden in regelmäßigen Intervallen gespeichert.</string>
@@ -77,4 +77,13 @@
     <string name="stat_type_calibration_before">Vor Höheneinstellung</string>
     <string name="stat_type_reset_after">Nach Zurücksetzen</string>
     <string name="stat_type_reset_before">Vor Zurücksetzen</string>
+    <string name="alert_message_autoclean_changed">Alle alten Dateien werden sofort gemäß Einstellung gelöscht. Sind Sie sich sicher?</string>
+    <string name="No">Nein</string>
+    <string name="Yes">Ja</string>
+    <string name="alert_message_num_changed">Alle alten Dateien werden sofort gemäß Einstellung gelöscht. Sind Sie sich sicher?</string>
+    <string name="alert_title_autoclean_change">Lösche alte Dateien!</string>
+    <string name="alert_title_num_change">Lösche alte Dateien!</string>
+    <string name="OK">OK</string>
+    <string name="alert_message_zero_num">0 ist nicht als maximale Anzahl der Dateien erlaubt.</string>
+    <string name="alert_title_zero_num">0 ist nicht erlaubt.</string>
 </resources>
