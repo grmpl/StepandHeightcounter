@@ -1,5 +1,6 @@
 # StepandHeightcounter
-This app counts steps and elevation gain on a Nexus 5x (and maybe other devices with an step sensor and a pressure sensor).
+This app counts steps and elevation gain on a Nexus 5x. It should work on all devices with a step counter sensor and a pressure sensor, but I haven't tested it. The step counter sensor is a special sensor which counts the steps by itself without additional software and is not to be mistaken with a step detector sensor. I have seen a device which reports to have step counter sensor, but the sensor doesn't give any values, so app is running without errors, but you don't get any values. Therefore: Don't put the blame on me, if app isn't working.
+
 Elevation gain is counted only when walking, so driving and elevators will not count.
 Riding a bycicle will give a step counting and therefore an elevation gain. I can't think of a way to stop this, so you have to pause measurement if you don't want it.  
 You should also shut off measurement when walking in subways or trains. Measurement of elevation gain would be disturbed as air pressure will change significantly during driving.
