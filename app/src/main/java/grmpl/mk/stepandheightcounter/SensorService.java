@@ -34,7 +34,7 @@ public class SensorService extends Service {
 
     // ** Simple objects **
     // remember if listeners are already running
-    boolean mRegistered = false;
+    private boolean mRegistered = false;
 
     // correlate sensor timestamp and real time
     private long          mTimestampDeltaMilliSec;
@@ -64,32 +64,32 @@ public class SensorService extends Service {
     // ** External classes **
     // * My own classes *
     // SaveData
-    SaveData mSave;
+    private SaveData mSave;
 
     // * external *
     // to return a binder-Object
-    IBinder               mBinder = new LocalBinder();
+    private IBinder               mBinder = new LocalBinder();
     // SensorManager, to handle the sensors
     private SensorManager mSensorManager;
     // Sensors: Step-Sensor, pressure sensor and significant motion sensor
     private Sensor        mStepSensor, mBarometer, mMotion;
 
     // Start and stop alarm
-    AlarmReceiver mAlarm;
+    private AlarmReceiver mAlarm;
 
     //Preferences
-    SharedPreferences mSettings;
+    private SharedPreferences mSettings;
 
     //Notification Manager to update notification
-    NotificationManager mNotificationManager;
+    private NotificationManager mNotificationManager;
 
     //Pending Intent to call Activity from notification
-    PendingIntent mPIntentActivity;
+    private PendingIntent mPIntentActivity;
 
     //For wakelocks
-    PowerManager mPowerManger;
+    private PowerManager mPowerManger;
     //Wakelock for settling of pressure sensor - acquire at first event, release at later event
-    PowerManager.WakeLock mWakelockSettle;
+    private PowerManager.WakeLock mWakelockSettle;
 
     // Was only needed for idleMessage, we now use standard messages
     // MessageQueue         mQueue;
@@ -106,7 +106,7 @@ public class SensorService extends Service {
             timestamp = t;
         }
     }
-    ArrayList<mPressureHistory> mPressureHistoryList = new ArrayList<>();
+    private ArrayList<mPressureHistory> mPressureHistoryList = new ArrayList<>();
 
 
     // Storing all data
@@ -132,15 +132,15 @@ public class SensorService extends Service {
     }
 
     // We need a list to save the events and process (correlate) them asynchronously
-    ArrayList<mStepSensorValues> mStepHistoryList = new ArrayList<>();
+    private ArrayList<mStepSensorValues> mStepHistoryList = new ArrayList<>();
     // for calculating delta we remember the last values
     //   we don't use the array, as it is difficult to handle init- and before-values
-    mStepSensorValues mStepValuesCorrBefore = null;
+    private mStepSensorValues mStepValuesCorrBefore = null;
 
     /* See https://developer.android.com/reference/android/app/Service.html#LocalServiceSample
        Public class to access Service
      */
-    public class LocalBinder extends Binder {
+    class LocalBinder extends Binder {
         SensorService getServerInstance() {
             return SensorService.this;
         }
@@ -187,7 +187,7 @@ public class SensorService extends Service {
     }
 
     // ** Start/Stop measuring **
-    public boolean startListeners() {
+    boolean startListeners() {
         mSave.saveDebugStatus("Start measurement requested");
         if (!mRegistered) {
             // this must finish, so request a wakelock
@@ -243,7 +243,7 @@ public class SensorService extends Service {
         else return true;
     }
 
-    public int stopListeners() {
+    int stopListeners() {
         savePersistent();
 
         mSave.saveDebugStatus("Stopping measurement");
@@ -330,12 +330,15 @@ public class SensorService extends Service {
             if (values.steptimestamp > (mPressureHistoryList.get(highindex).timestamp)) {
                 mSave.saveDebugStatus("No actual pressure value, putting additional task in queue 2 seconds later");
                 Handler handler = new Handler();
+                handler.postDelayed(this::correlateSensorEvents, cDELAY_CORRELATION);
+                /* was
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         correlateSensorEvents();
                     }
                 }, cDELAY_CORRELATION);
+                */
                 // Stop looping over step events, wouldn't make sense
                 break;
             }
@@ -611,12 +614,15 @@ public class SensorService extends Service {
                 mStepSensorValues data = new mStepSensorValues(steptimestamp, stepsact);
                 mStepHistoryList.add(data);
                 Handler handler = new Handler();
+                handler.postDelayed(SensorService.this::correlateSensorEvents,cDELAY_CORRELATION_FIRST);
+                /* was
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         correlateSensorEvents();
                     }
                 },cDELAY_CORRELATION_FIRST);
+            */
                 mSave.saveDebugStatus("Step Counter init.");
             }
             /*
@@ -630,13 +636,15 @@ public class SensorService extends Service {
                 // and remember it for next check
                 mStepsSensBefore = stepsact;
                 Handler handler = new Handler();
+                handler.postDelayed(SensorService.this::correlateSensorEvents,cDELAY_CORRELATION_FIRST);
+                /* was
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         correlateSensorEvents();
                     }
                 },cDELAY_CORRELATION_FIRST);
-
+                */
                 mSave.saveDebugStatus("Step Counter event saved");
             }
             // else do nothing, not enough steps to care
@@ -645,7 +653,7 @@ public class SensorService extends Service {
 
     // ** Methods for Activity and helpers **
 
-    public void calibrateHeight(float cHeight){
+    void calibrateHeight(float cHeight){
         // if pressure is already measured, calculate sea level pressure from actual pressure
         if (mPressure > 0) {
             if (getDetailSave("c"))
@@ -671,7 +679,7 @@ public class SensorService extends Service {
         else mCalibrationHeight = cHeight;
     }
 
-    public void resetData() {
+    void resetData() {
         if (getDetailSave("r"))
             mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), getString(R.string.stat_type_reset_before) );
         mStepsCumul[0] = 0;
@@ -683,7 +691,7 @@ public class SensorService extends Service {
             mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), getString(R.string.stat_type_reset_after) );
     }
 
-    public void getValues() {
+    void getValues() {
         // if we are measuring, update statistic values
         if (mRegistered) periodicStatistics(System.currentTimeMillis(),cISRUNNING);
         else periodicStatistics(System.currentTimeMillis(),cNOTRUNNING);
@@ -707,7 +715,7 @@ public class SensorService extends Service {
         sendBroadcast(callback);
     }
 
-    boolean getDetailSave(String identifier){
+    private boolean getDetailSave(String identifier){
         Set<String> detail_multi = mSettings.getStringSet(cPREF_STAT_DETAIL_MULTI, cPREF_STAT_DETAIL_MULTI_DEFAULT);
 
         for (String s:  detail_multi ) {
@@ -723,14 +731,14 @@ public class SensorService extends Service {
         else return calcHeight(mPressure);
     }
 
-    float calcHeight(float pressure){
+    private float calcHeight(float pressure){
         //According to Wikipedia this is the "official" international hypsometric formula
         // on http://keisan.casio.com/ there is a similar, but different formula
         // I don't know which is the better one.
         return (float) ((1 - pow((pressure / mPressureZ), (1 / 5.255))) * 288.15 / 0.0065);
     }
 
-    void savePersistent() {
+    private void savePersistent() {
         SharedPreferences.Editor editpref = mSettings.edit();
         // only steps, elevation gain and calibration is important to remember
         //  all other values will be calculated again after init
@@ -744,7 +752,7 @@ public class SensorService extends Service {
 
     }
 
-    void restorePersistent() {
+    private void restorePersistent() {
         // only steps, elevation gain and calibration is important to remember
         //  all other values will be calculated again after init
         for ( int i = 0; i < mStepsCumul.length; i++){
@@ -755,7 +763,7 @@ public class SensorService extends Service {
         mPressureZ = mSettings.getFloat("mPressureZ", cPRESSURE_SEA);
     }
 
-    void periodicStatistics(long acttimestamp_msec, int running){  //acttimestamp in milliseconds
+    private void periodicStatistics(long acttimestamp_msec, int running){  //acttimestamp in milliseconds
         // Check, if we have to save statistic data
         //   we look for timestamp of last saved event and compare it to actual timestamp
         //   if it is in previous interval:

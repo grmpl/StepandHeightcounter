@@ -49,10 +49,10 @@ public class MainActivity extends AppCompatActivity {
 
     private ProgressBar mStepDailyProgress, mHeightDailyProgress;
     boolean mBounded = false, mRunning = false;
-    SensorService mSensService;
-    MyReceiver mReceiver = null;
-    SharedPreferences mSettings;
-    SaveData mSave;
+    private SensorService mSensService;
+    private MyReceiver mReceiver = null;
+    private SharedPreferences mSettings;
+    private SaveData mSave;
 
 
     @Override
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // action for start button: starting measurement
-    public void startLogger() {
+    private void startLogger() {
         boolean succ = mSensService.startListeners();
         if(succ && mSettings.getBoolean(cPREF_DEBUG,false))
             Toast.makeText(MainActivity.this, R.string.debug_listener_started, Toast.LENGTH_SHORT).show();
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // action for stop button: stopping measurement
-    public void stopLogger() {
+    private void stopLogger() {
         /*
            Todo: Service could be stopped completely. Keeping service alive is a relict from
                   previous versions where I didn't have implemented the persistency.
@@ -250,16 +250,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // as long as service is running, we update height information regulary
-    void getHeightRegulary(){
+    private void getHeightRegulary(){
         if (mSensService != null) {
             mHeightText.setText(String.format(Locale.getDefault(), "%.1f m", mSensService.getHeight()));
             Handler handler = new Handler();
+            handler.postDelayed(this::getHeightRegulary, cINTERVAL_UPDATE_HEIGHT);
+            /* Same as:
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     getHeightRegulary();
                 }
             }, cINTERVAL_UPDATE_HEIGHT);
+            */
         }
     }
 
@@ -273,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
     public class MyReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent receive){
+            // set all output fields
             String outtext = receive.getStringExtra("Status");
             mStatusText.setText(outtext);
             Float steps = receive.getFloatExtra("Steps",0F);
@@ -283,8 +287,10 @@ public class MainActivity extends AppCompatActivity {
             mHeightaccText.setText(String.format(Locale.getDefault(),"%.1f m",heightacc));
             Float stepstoday = receive.getFloatExtra("Stepstoday",0F);
             mStepDailyText.setText(String.format(Locale.getDefault(),"%.0f",stepstoday));
+            // set progress bars
             int dailysteps = Integer.valueOf(mSettings.getString(cPREF_TARGET_STEPS, "100000"));
-            if (stepstoday < dailysteps) {
+            // dailysteps can be set to zero, we must avoid division by zero when stepstoday is wrongly set to negative
+            if (stepstoday < dailysteps  && stepstoday >= 0) {
                 // difficult to read, bar color sufficient: mStepDailyText.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
                 mStepDailyProgress.setProgress( (int)(100 * stepstoday) / dailysteps );
                 mStepDailyProgress.setProgressTintList(
@@ -299,7 +305,8 @@ public class MainActivity extends AppCompatActivity {
             Float heighttoday = receive.getFloatExtra("Heighttoday",0F);
             mHeightDailyText.setText(String.format(Locale.getDefault(),"%.1f m",heighttoday));
             int dailyheight = Integer.valueOf(mSettings.getString(cPREF_TARGET_HEIGHT, "100"));
-            if (heighttoday < dailyheight) {
+            // see above
+            if (heighttoday < dailyheight && heighttoday >=0 ) {
                 // difficult to read, bar color sufficient: mHeightDailyText.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
                 mHeightDailyProgress.setProgress( (int)(100 * heighttoday) / dailyheight );
                 mHeightDailyProgress.setProgressTintList(
@@ -311,6 +318,8 @@ public class MainActivity extends AppCompatActivity {
                 mHeightDailyProgress.setProgressTintList(
                         ColorStateList.valueOf(ContextCompat.getColor(context,R.color.colorPrimaryDark)));
             }
+
+            // set Start/Stop-Button
             mRunning = receive.getBooleanExtra("Registered",false);
 
             if(mRunning){
@@ -332,7 +341,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    // this is the callback if permission dialog is ended - we save the result
+    // this is the callback if permission dialog is ended - we just save the result for later
     @Override
     public void onRequestPermissionsResult(
             int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
@@ -358,14 +367,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // checking what values have to be saved in detail statistics
-    boolean getDetailSave(String identifier){
+    private boolean getDetailSave(String identifier){
         Set<String> detail_multi = mSettings.getStringSet(cPREF_STAT_DETAIL_MULTI, cPREF_STAT_DETAIL_MULTI_DEFAULT);
 
         boolean ret = false;
         for (String s:  detail_multi ) {
             ret = ret || s.equals(identifier);
         }
-
         return ret;
     }
 
