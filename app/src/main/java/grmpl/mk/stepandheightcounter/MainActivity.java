@@ -296,9 +296,16 @@ public class MainActivity extends AppCompatActivity {
                 mStepDailyProgress.setProgressTintList(
                         ColorStateList.valueOf(ContextCompat.getColor(context,R.color.colorAccent)));
             }
-            else {
+            // Target reached
+            else if (stepstoday >= dailysteps) {
                 // difficult to read, bar color sufficient: mStepDailyText.setTextColor(ContextCompat.getColor(context,R.color.colorPrimaryDark));
                 mStepDailyProgress.setProgress( 100 );
+                mStepDailyProgress.setProgressTintList(
+                        ColorStateList.valueOf(ContextCompat.getColor(context,R.color.colorPrimaryDark)));
+            }
+            // anything other (e.g. no measurement yet
+            else {
+                mStepDailyProgress.setProgress( 0 );
                 mStepDailyProgress.setProgressTintList(
                         ColorStateList.valueOf(ContextCompat.getColor(context,R.color.colorPrimaryDark)));
             }
@@ -312,9 +319,14 @@ public class MainActivity extends AppCompatActivity {
                 mHeightDailyProgress.setProgressTintList(
                         ColorStateList.valueOf(ContextCompat.getColor(context,R.color.colorAccent)));
             }
-            else {
+            else if (heighttoday >= dailyheight){
                 // difficult to read, bar color sufficient: mHeightDailyText.setTextColor(ContextCompat.getColor(context,R.color.colorPrimaryDark));
                 mHeightDailyProgress.setProgress( 100 );
+                mHeightDailyProgress.setProgressTintList(
+                        ColorStateList.valueOf(ContextCompat.getColor(context,R.color.colorPrimaryDark)));
+            }
+            else {
+                mHeightDailyProgress.setProgress( 0 );
                 mHeightDailyProgress.setProgressTintList(
                         ColorStateList.valueOf(ContextCompat.getColor(context,R.color.colorPrimaryDark)));
             }
