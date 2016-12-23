@@ -1,6 +1,5 @@
 package grmpl.mk.stepandheightcounter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
@@ -290,13 +289,16 @@ class SaveData {
     // deleting old files
     private void deleteFiles(String type, int keep){
         File directory = getDirectory();
-        String filenameend = getFilenameEnding(type);
+        final String filenameend = getFilenameEnding(type);
 
         // Always keep one file, even if check in settings went wrong
         if (keep < 1) keep = 1;
 
-        File[] filelist = directory.listFiles((file1, s) -> {
-            return s.contains(filenameend);
+        File[] filelist = directory.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File file, String s) {
+                return s.contains(filenameend);
+            }
         });
         int deletefiles = filelist.length - keep;
         if (deletefiles > 0) {
