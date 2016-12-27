@@ -5,7 +5,7 @@
     <string name="permission_SD">No permission to write to SD Card</string>
     <string name="sensor_active">Stepsensor active</string>
     <string name="button_running">Running\nPress to Pause</string>
-    <string name="sensor_register_failed">Register Stepsensor failed</string>
+    <string name="sensor_register_failed">Cannot activate barometric sensor. App doesn\'t run without one!</string>
     <string name="sensor_pause">Stepsensor paused</string>
     <string name="button_pause">Start Measurement</string>
     <string name="debug_create_finished" translatable="false">Create finished</string>

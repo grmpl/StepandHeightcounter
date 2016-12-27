@@ -6,7 +6,7 @@
     <string name="permission_SD">App benötigt Erlaubnis zur Speicherung auf SD-Karte</string>
     <string name="sensor_active">Stepsensor ist aktiv</string>
     <string name="button_running">Läuft\nFür Pause hier drücken</string>
-    <string name="sensor_register_failed">Stepsensor konnte nicht registriert werden</string>
+    <string name="sensor_register_failed">Drucksensor kann nicht aktiviert werden. App geht nicht ohne Drucksensor!</string>
     <string name="sensor_pause">Stepsensor ist angehalten</string>
     <string name="button_pause">Starte Messung</string>
     <string name="button_restart">Applikation neu starten</string>

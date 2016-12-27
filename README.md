@@ -1,5 +1,7 @@
 # StepandHeightcounter
-This Android app counts steps and elevation gain on a Nexus 5x. It should work on all devices with a step counter sensor and a pressure sensor, but I haven't tested it. The step counter sensor is a special sensor which counts the steps by itself without additional software and is not to be mistaken with a step detector sensor. I have seen a device which reports to have step counter sensor, but the sensor doesn't give any values, so app is running without errors, but you don't get any values. Therefore: Don't put the blame on me, if app isn't working.
+This Android app counts steps and elevation gain on a Nexus 5x. It should work on all devices with a step counter sensor and a pressure sensor, but I haven't tested it.
+A pressure or barometric sensor is mandatory, steps will not be counted without pressure values. The step counter sensor is a special sensor which counts the steps by itself without additional software and is not to be mistaken with a step detector sensor.
+So, if you are using another device, don't put the blame on me if it is not working.
 
 I've written the app, because I was interested in my elevation gain when I walk up the stairs instead of using the elevator. I couldn't find any app with this feature yet. (I haven't tried one of the big activity apps, because they are doing much more than I want.)
 
