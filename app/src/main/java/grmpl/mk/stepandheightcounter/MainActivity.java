@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         mHeightText = (TextView)findViewById(R.id.textViewHeightO);
         mHeightaccText = (TextView)findViewById(R.id.textViewHeightaccO);
         mStepText = (TextView)findViewById(R.id.textViewStepO);
-        mStartButton = (Button)findViewById(R.id.buttonStart);
         mCalibrateIn = (EditText)findViewById(R.id.editTextHeightcal);
         mStartButton = (Button)findViewById(R.id.buttonStart);
         mStepDailyText = (TextView)findViewById(R.id.textViewDailyStepsNum);
@@ -141,6 +140,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+        // Todo: Rework necessary if service will be stopped
+        //        if service is stopped, we don't get actual values
         // get actual values
         if(mSensService != null ) {
             mSensService.getValues();
@@ -200,9 +201,11 @@ public class MainActivity extends AppCompatActivity {
     // action for stop button: stopping measurement
     private void stopLogger() {
         /*
-           Todo: Service could be stopped completely. Keeping service alive is a relict from
-                  previous versions where I didn't have implemented the persistency.
-                  Rework has to be done carefully, I don't know where I anticipate a running service.
+           Todo: Service could be stopped completely. Keeping service alive is a relict
+                  from previous versions where I didn't have implemented the persistency.
+                  Stopping of service would free memory ressources. But I have some features
+                  which depend on running service even if no measurement is running.
+                  (e.g. height calibration and reset)
          */
 
         /*
@@ -214,6 +217,8 @@ public class MainActivity extends AppCompatActivity {
 
     // action for reset button: reset values
     public void resetData(View view) {
+        // Todo: Rework necessary if service will be stopped
+        //        at the moment reset can be done even without service
         if (mSensService != null) mSensService.resetData();
         mStepText.setText(R.string.zero);
         mHeightText.setText(R.string.height_init1);

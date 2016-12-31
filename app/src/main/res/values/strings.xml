@@ -48,12 +48,12 @@
     <string name="pref_title_stat_detail_clear">AutoClean of detailed statistic data</string>
     <string name="pref_cat_stat_det">Detailed statistics</string>
     <string name="pref_cat_deb">Debugging</string>
-    <string name="text_reset">Set steps and elevation gain to zero.</string>
+    <string name="text_reset">Reset steps, elevation gain  and height calibration to zero.</string>
     <string name="saving_marker">Saving marker</string>
-    <string name="pref_stat_sum">Data will be saved to directory StepandHeightCounter on SD-Card</string>
+    <string name="pref_stat_sum">Data will be saved to directory \"StepandHeightCounter\" on SD-Card</string>
     <string name="pref_title_stat_hour">Regular statistics</string>
     <string name="pref_title_stat_hour_clear">AutoClean of regular statistics</string>
-    <string name="pref_stat_clear_sum">Delete old files.\n(Change will take effect when next file is created)</string>
+    <string name="pref_stat_clear_sum">Delete old files.</string>
     <string name="pref_title_stat_clear_num">Maximum files</string>
     <string name="pref_stat_clear_num_sum">Maximum number of files to keep.</string>
     <string name="pref_title_stat_hour_min">Interval</string>
@@ -72,7 +72,7 @@
     <string name="height">Height</string>
     <string name="pref_cat_target">Daily target values</string>
     <string name="pref_stat_detail_multi_title">Detailed statistics</string>
-    <string name="pref_stat_detail_multi_summary">Save different events. One file per day.</string>
+    <string name="pref_stat_detail_multi_summary">Save various events. One file per day.</string>
     <string name="pref_stat_detail_multi_dialog_title">What to save</string>
     <string name="pref_stat_detail_marker">Marker</string>
     <string name="pref_stat_detail_start">Start measurement</string>

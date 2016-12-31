@@ -37,7 +37,7 @@
     <string name="pref_cat_deb">Debugging</string>
     <string name="pref_cat_stat">Statistiken</string>
     <string name="pref_cat_stat_det">Detaillierte Statistik</string>
-    <string name="text_reset">Schritte und Höhenmeter zurücksetzen.</string>
+    <string name="text_reset">Schrittzahl, Höhenmeter und Höhenkorrektur zurücksetzen.</string>
     <string name="pref_stat_clear_num_sum">Wie viele Dateien sollen jeweils erhalten bleiben?</string>
     <string name="pref_stat_clear_sum">Alte Dateien werden gelöscht.</string>
     <string name="pref_stat_daily_sum">Jeden Tag werden Schritte und Höhenmeter gespeichert, pro Jahr wird eine Datei erzeugt.\nEs gibt kein automatisches Löschen.</string>
@@ -48,7 +48,7 @@
     <string name="pref_title_stat_hour_clear">Autom. Bereinigung der regelm. Statistiken</string>
     <string name="pref_title_stat_hour_min">Intervall</string>
     <string name="pref_title_stat_daily">Tägliche Statistiken</string>
-    <string name="pref_title_stat_clear_num">Maximale Anzahl Dateien.</string>
+    <string name="pref_title_stat_clear_num">Maximale Anzahl Dateien</string>
     <string name="saving_marker">Speichere Marker.</string>
     <string name="pref_stat_hour_list_1">15 Minuten</string>
     <string name="pref_stat_hour_list_2">1/2 Stunde</string>

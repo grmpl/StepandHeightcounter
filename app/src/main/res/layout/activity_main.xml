@@ -26,7 +26,7 @@
         android:layout_margin="@dimen/fab_margin"
         app:layout_anchor="@+id/include"
         app:layout_anchorGravity="bottom|right"
-        android:layout_gravity="top|left"
+        android:layout_gravity="top|start"
         app:srcCompat="?attr/actionModePasteDrawable"
         android:tint="@android:color/darker_gray" />
 
