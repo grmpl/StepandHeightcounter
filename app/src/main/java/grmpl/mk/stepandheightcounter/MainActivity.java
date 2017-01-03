@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
             mSensService.getValues();
         }
 
+
         // permissions and settings could change during pause
         mSave = new SaveData(this);
         if (!(new CheckSDCard(this).checkWriteSDCard())) {
@@ -175,6 +176,16 @@ public class MainActivity extends AppCompatActivity {
             });
         }
         else mFloatingButton.setVisibility(View.GONE);
+        Handler handler = new Handler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mStartButton.requestFocus();
+                mStartButton.requestFocusFromTouch();
+            }
+        });
+
+
     }
 
     // Only unbind, if destroyed
