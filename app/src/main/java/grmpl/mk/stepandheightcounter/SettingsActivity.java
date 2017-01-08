@@ -83,8 +83,8 @@ public class SettingsActivity extends PreferenceActivity{
                     // if value is smaller than before and autoclean on, make AlertDialog and delete files
                     else if ( Integer.valueOf(settings.getString( key, "999")) > newnumber && autocleanon){
                         new AlertDialog.Builder(getActivity())
-                                .setTitle(R.string.alert_title_num_change)
-                                .setMessage(R.string.alert_message_num_changed)
+                                .setTitle(R.string.alert_title_autoclean_change)
+                                .setMessage(R.string.alert_message_autoclean_changed)
                                 .setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int whichButton) {

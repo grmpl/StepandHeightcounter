@@ -84,12 +84,10 @@
     <string name="stat_type_calibration_before">Before calibration</string>
     <string name="stat_type_calibration_after">After calibration</string>
     <string name="stat_type_reset_after">After reset</string>
-    <string name="alert_title_num_change">Delete old files!</string>
-    <string name="alert_message_num_changed">This will immediately delete all old files according to setting! Are you sure?</string>
     <string name="No">No</string>
     <string name="Yes">Yes</string>
     <string name="alert_title_autoclean_change">Delete old files!</string>
-    <string name="alert_message_autoclean_changed">This will immediately delete all old files according to setting! Are you sure?</string>
+    <string name="alert_message_autoclean_changed">This will immediately delete existing old files according to setting!\nAre you sure?</string>
     <string name="OK">OK</string>
     <string name="alert_title_zero_num">0 not allowed</string>
     <string name="alert_message_zero_num">0 is not allowed for number of files to keep.</string>
