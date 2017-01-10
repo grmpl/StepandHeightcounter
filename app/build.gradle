@@ -6,9 +6,9 @@ android {
     defaultConfig {
         applicationId "grmpl.mk.stepandheightcounter"
         minSdkVersion 21
-        targetSdkVersion 24
-        versionCode 3
-        versionName "1.1"
+        targetSdkVersion 25
+        versionCode 4
+        versionName "1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         jackOptions{
             enabled true
