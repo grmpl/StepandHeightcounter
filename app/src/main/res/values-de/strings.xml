@@ -77,12 +77,10 @@
     <string name="stat_type_calibration_before">Vor Höheneinstellung</string>
     <string name="stat_type_reset_after">Nach Zurücksetzen</string>
     <string name="stat_type_reset_before">Vor Zurücksetzen</string>
-    <string name="alert_message_autoclean_changed">Alle alten Dateien werden sofort gemäß Einstellung gelöscht. Sind Sie sich sicher?</string>
+    <string name="alert_message_autoclean_changed">Evt. vorhandene alte Dateien werden sofort gemäß Einstellung gelöscht.\nÄnderung durchführen?</string>
     <string name="No">Nein</string>
     <string name="Yes">Ja</string>
-    <string name="alert_message_num_changed">Alle alten Dateien werden sofort gemäß Einstellung gelöscht. Sind Sie sich sicher?</string>
     <string name="alert_title_autoclean_change">Lösche alte Dateien!</string>
-    <string name="alert_title_num_change">Lösche alte Dateien!</string>
     <string name="OK">OK</string>
     <string name="alert_message_zero_num">0 ist nicht als maximale Anzahl der Dateien erlaubt.</string>
     <string name="alert_title_zero_num">0 ist nicht erlaubt.</string>

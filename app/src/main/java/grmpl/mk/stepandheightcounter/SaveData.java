@@ -289,6 +289,7 @@ class SaveData {
     // deleting old files
     private void deleteFiles(String type, int keep){
         File directory = getDirectory();
+        if (!directory.exists()) return;
         final String filenameend = getFilenameEnding(type);
 
         // Always keep one file, even if check in settings went wrong

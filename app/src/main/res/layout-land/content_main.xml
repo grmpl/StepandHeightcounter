@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/content_main"
+    android:id="@+id/content_main_landscape"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:orientation="horizontal"
     android:baselineAligned="false"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="grmpl.mk.stepandheightcounter.MainActivity"
     tools:showIn="@layout/activity_main">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/ScrollView01"
-        android:layout_weight="4"
-        android:layout_height="match_parent"
-        android:layout_width="wrap_content"
-        android:layout_marginEnd="20dp">
 
         <RelativeLayout
             android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_marginEnd="20dp">
+            android:layout_width="wrap_content"
+            android:layout_weight="4"
+            android:layout_marginEnd="40dp">
 
             <Button
                 android:text="@string/button_pause"
@@ -43,7 +43,7 @@
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/textViewError"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:layout_below="@+id/buttonStart"
                 android:layout_alignParentStart="true" />
 
@@ -134,100 +134,101 @@
                 android:onClick="calibrateHeight"
                 android:layout_alignBaseline="@id/editTextHeightcal"
                 android:layout_toEndOf="@id/editTextHeightcal"
-                android:layout_marginStart="40dp" />
+                android:layout_marginStart="40dp"
+                android:layout_marginBottom="10dp"/>
 
         </RelativeLayout>
 
-    </ScrollView>
 
-    <RelativeLayout
-        android:layout_height="match_parent"
-        android:layout_weight="6"
-        android:layout_width="wrap_content">
+        <RelativeLayout
+            android:layout_height="match_parent"
+            android:layout_weight="6"
+            android:layout_width="wrap_content">
 
-        <ProgressBar
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:id="@+id/progressBarSteps"
-            android:layout_alignParentEnd="true"
-            android:progressBackgroundTint="@android:color/darker_gray"
-            android:max="100" />
+            <ProgressBar
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:id="@+id/progressBarSteps"
+                android:layout_alignParentEnd="true"
+                android:progressBackgroundTint="@android:color/darker_gray"
+                android:max="100" />
 
-        <TextView
-            android:text="@string/daily_steps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/progressBarSteps"
-            android:id="@+id/textViewDailySteps"
-            android:textAppearance="@android:style/TextAppearance.Material.Medium"
-            android:textColor="?android:attr/textColorPrimary" />
+            <TextView
+                android:text="@string/daily_steps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/progressBarSteps"
+                android:id="@+id/textViewDailySteps"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                android:textColor="?android:attr/textColorPrimary" />
 
-        <ProgressBar
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textViewDailySteps"
-            android:layout_alignStart="@+id/textViewDailySteps"
-            android:layout_marginTop="@dimen/default_gap"
-            android:id="@+id/progressBarHeight"
-            android:layout_alignParentEnd="true"
-            android:progressBackgroundTint="@android:color/darker_gray"
-            android:max="100" />
+            <ProgressBar
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textViewDailySteps"
+                android:layout_alignStart="@+id/textViewDailySteps"
+                android:layout_marginTop="@dimen/default_gap"
+                android:id="@+id/progressBarHeight"
+                android:layout_alignParentEnd="true"
+                android:progressBackgroundTint="@android:color/darker_gray"
+                android:max="100" />
 
-        <TextView
-            android:text="@string/height_today"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/progressBarHeight"
-            android:layout_alignStart="@+id/progressBarHeight"
-            android:id="@+id/textViewDailyHeight"
-            android:textAppearance="@android:style/TextAppearance.Material.Medium"
-            android:textColor="?android:attr/textColorPrimary" />
+            <TextView
+                android:text="@string/height_today"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/progressBarHeight"
+                android:layout_alignStart="@+id/progressBarHeight"
+                android:id="@+id/textViewDailyHeight"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                android:textColor="?android:attr/textColorPrimary" />
 
-        <TextView
-            android:text="@string/zero"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textViewDailyStepsNum"
-            android:layout_alignBaseline="@+id/textViewDailySteps"
-            android:layout_alignBottom="@+id/textViewDailySteps"
-            android:layout_alignParentEnd="true"
-            android:textAppearance="@android:style/TextAppearance.Material.Medium"
-            android:textColor="?android:attr/textColorPrimary"/>
+            <TextView
+                android:text="@string/zero"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewDailyStepsNum"
+                android:layout_alignBaseline="@+id/textViewDailySteps"
+                android:layout_alignBottom="@+id/textViewDailySteps"
+                android:layout_alignParentEnd="true"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                android:textColor="?android:attr/textColorPrimary"/>
 
-        <TextView
-            android:text="@string/zero_m"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textViewDailyHeightNum"
-            android:layout_alignBaseline="@+id/textViewDailyHeight"
-            android:layout_alignBottom="@+id/textViewDailyHeight"
-            android:layout_alignParentEnd="true"
-            android:textAppearance="@android:style/TextAppearance.Material.Medium"
-            android:textColor="?android:attr/textColorPrimary"/>
+            <TextView
+                android:text="@string/zero_m"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewDailyHeightNum"
+                android:layout_alignBaseline="@+id/textViewDailyHeight"
+                android:layout_alignBottom="@+id/textViewDailyHeight"
+                android:layout_alignParentEnd="true"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                android:textColor="?android:attr/textColorPrimary"/>
 
-        <Button
-            android:text="@string/button_reset_all"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/buttonReset"
-            android:onClick="resetData"
-            style="@android:style/Widget.Material.Button"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"/>
+            <Button
+                android:text="@string/button_reset_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/buttonReset"
+                android:onClick="resetData"
+                style="@android:style/Widget.Material.Button"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"/>
 
-        <TextView
-            android:text="@string/text_reset"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView"
-            android:layout_below="@id/buttonReset"
-            android:layout_centerHorizontal="true"
-            android:textAlignment="center" />
+            <TextView
+                android:text="@string/text_reset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView"
+                android:layout_below="@id/buttonReset"
+                android:layout_centerHorizontal="true"
+                android:textAlignment="center" />
 
-    </RelativeLayout>
+        </RelativeLayout>
 
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>
 
