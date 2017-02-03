@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
         else if (mSettings.getBoolean(cPREF_DEBUG, false))
                 Toast.makeText(MainActivity.this, R.string.service_not_started, Toast.LENGTH_LONG).show();
 
-        // I don't remember why this is necessary:
+        // Closing keyboard
         InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }

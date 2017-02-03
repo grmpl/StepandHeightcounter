@@ -544,7 +544,7 @@ public class SensorService extends Service {
                     //  so if delta is smaller it'a a better value
                     if ( tsdelta < mTimestampDeltaMilliSec )
                         mTimestampDeltaMilliSec = tsdelta;
-                } // time is over - calibrate if necessary and start measurement
+                } // time is over - start measurement
                 else {
                     mSave.saveDebugStatus("Wating time over, starting Step sensor");
                     // register StepSensor
@@ -569,7 +569,8 @@ public class SensorService extends Service {
                     // mPressure is just the last valid average over 5 pressure values
                     //  if there is a problem with getting pressure values, we won't notice
                     mPressure = mPressureTemporary / cPRESSURE_AVG_COUNT;
-                    // check if calibration is needed
+                    // always check if calibration is needed
+                    // Todo: Bad value, calibration with height 0 must be possible.
                     if(mCalibrationHeight != 0) calibrateHeight(mCalibrationHeight);
 
                     // remember the last 400 values of pressure
@@ -670,6 +671,7 @@ public class SensorService extends Service {
             editpref.putFloat("mPressureZ",mPressureZ);
             editpref.apply();
             // calibration done, temporary value must be cleared
+            // Todo: Bad value!!! Calibration with height zero must be possible!!!!
             mCalibrationHeight = 0;
             if (getDetailSave("c"))
                 mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), getString(R.string.stat_type_calibration_after));

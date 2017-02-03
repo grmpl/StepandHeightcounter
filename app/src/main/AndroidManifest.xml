@@ -18,9 +18,11 @@
              android:parentActivityName="grmpl.mk.stepandheightcounter.MainActivity">
         </activity>
 
-        <service android:name=".SensorService" ></service>
+        <service android:name=".SensorService" />
         <!-- Receiver for alarm - receiver for Service Callback is registered dynamically in Activity-Class -->
-        <receiver android:process=":remote" android:name=".AlarmReceiver"></receiver>
+        <receiver
+            android:process=":remote"
+            android:name=".AlarmReceiver" />
     </application>
 
 </manifest>
