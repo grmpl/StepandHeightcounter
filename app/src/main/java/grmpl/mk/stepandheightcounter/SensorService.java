@@ -52,14 +52,14 @@ public class SensorService extends Service {
     private float         mHeightBefore = 0;
     // Reference height
     private long          mHeightRefTimestamp = 0;  //nanoseconds
-    private float         mHeightRef = cINIT_HEIGHT_REF;
+    private float         mHeightRef = cINIT_HEIGHT_REFCAL;
 
     // timestamp of sensor events (nanoseconds!)
     private long mEvtTimestampMilliSec = 0; // we only need one timestamp for all *Cumul-values
 
 
     // Remember calibration height for first pressure measurement
-    private float         mCalibrationHeight = 0;
+    private float         mCalibrationHeight = cINIT_HEIGHT_REFCAL;
 
     // ** External classes **
     // * My own classes *
@@ -270,7 +270,7 @@ public class SensorService extends Service {
         mTimestampDeltaMilliSec = 0; // shouldn't be necessary, just make sure
 
         //after restart height reference will not be valid anymore
-        mHeightRef = cINIT_HEIGHT_REF;
+        mHeightRef = cINIT_HEIGHT_REFCAL;
 
 
         mAlarm.cancelAlarm(this);
@@ -400,7 +400,7 @@ public class SensorService extends Service {
                            / (values.steptimestamp - mStepValuesCorrBefore.steptimestamp)
                            > cMAX_ELEV_GAIN
                      ) ||
-                     ( mHeightRef <= cINIT_HEIGHT_REF )
+                     ( mHeightRef <= cINIT_HEIGHT_REFCAL)
                    ) {
                        mHeightRef = height;
                        mHeightRefTimestamp = values.steptimestamp;
@@ -570,8 +570,7 @@ public class SensorService extends Service {
                     //  if there is a problem with getting pressure values, we won't notice
                     mPressure = mPressureTemporary / cPRESSURE_AVG_COUNT;
                     // always check if calibration is needed
-                    // Todo: Bad value, calibration with height 0 must be possible.
-                    if(mCalibrationHeight != 0) calibrateHeight(mCalibrationHeight);
+                    if(mCalibrationHeight > cINIT_HEIGHT_REFCAL) calibrateHeight(mCalibrationHeight);
 
                     // remember the last 400 values of pressure
                     mPressureHistory pressure = new mPressureHistory(mPressure, sensorEvent.timestamp);
@@ -662,7 +661,8 @@ public class SensorService extends Service {
 
             // get pressure of height reference (saving it would be more difficult than reextracting
             //   as calibration would be done seldom)
-            double heightrefpressure = mPressureZ * pow(1-(cHeight * 0.0065 / 288.15),5.255);
+            // error found - wrong variable double heightrefpressure = mPressureZ * pow(1-(cHeight * 0.0065 / 288.15),5.255);
+            double heightrefpressure = mPressureZ * pow(1-(mHeightRef * 0.0065 / 288.15),5.255);
             // calculate new mPressureZ
             mPressureZ = (float) (mPressure / pow((1 - (cHeight * 0.0065 / 288.15)), 5.255));
             // calculate new height reference
@@ -671,8 +671,7 @@ public class SensorService extends Service {
             editpref.putFloat("mPressureZ",mPressureZ);
             editpref.apply();
             // calibration done, temporary value must be cleared
-            // Todo: Bad value!!! Calibration with height zero must be possible!!!!
-            mCalibrationHeight = 0;
+            mCalibrationHeight = cINIT_HEIGHT_REFCAL;
             if (getDetailSave("c"))
                 mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), getString(R.string.stat_type_calibration_after));
 
@@ -686,7 +685,7 @@ public class SensorService extends Service {
             mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), getString(R.string.stat_type_reset_before) );
         mStepsCumul[0] = 0;
         mPressureZ = cPRESSURE_SEA;
-        mHeightRef = cINIT_HEIGHT_REF; // 0 as init-value would not work at sea
+        mHeightRef = cINIT_HEIGHT_REFCAL; // 0 as init-value would not work at sea
         mHeightCumul[0] = 0;
         savePersistent();
         if (getDetailSave("r"))

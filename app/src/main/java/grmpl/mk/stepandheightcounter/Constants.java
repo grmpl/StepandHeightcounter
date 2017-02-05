@@ -75,7 +75,7 @@ final class Constants {
     final static float cPRESSURE_SEA = 1013.25F;
 
     // init-value for height reference
-    final static float cINIT_HEIGHT_REF = -9999;
+    final static float cINIT_HEIGHT_REFCAL = -9999;
 
     // we take care of new step sensor values only if more steps than this were taken
     final static int cMIN_STEPS_DELTA = 3;
