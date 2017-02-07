@@ -661,7 +661,6 @@ public class SensorService extends Service {
 
             // get pressure of height reference (saving it would be more difficult than reextracting
             //   as calibration would be done seldom)
-            // error found - wrong variable double heightrefpressure = mPressureZ * pow(1-(cHeight * 0.0065 / 288.15),5.255);
             double heightrefpressure = mPressureZ * pow(1-(mHeightRef * 0.0065 / 288.15),5.255);
             // calculate new mPressureZ
             mPressureZ = (float) (mPressure / pow((1 - (cHeight * 0.0065 / 288.15)), 5.255));
