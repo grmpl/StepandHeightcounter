@@ -14,7 +14,7 @@ import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -22,6 +22,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 import grmpl.mk.stepandheightcounter.SensorService.LocalBinder;
@@ -176,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
             });
         }
         else mFloatingButton.setVisibility(View.GONE);
-        Handler handler = new Handler();
+        Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -269,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
     private void getHeightRegulary(){
         if (mSensService != null) {
             mHeightText.setText(String.format(Locale.getDefault(), "%.1f m", mSensService.getHeight()));
-            Handler handler = new Handler();
+            Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(this::getHeightRegulary, cINTERVAL_UPDATE_HEIGHT);
             /* Same as:
             handler.postDelayed(new Runnable() {
@@ -301,10 +304,10 @@ public class MainActivity extends AppCompatActivity {
             mHeightText.setText(String.format(Locale.getDefault(),"%.1f m",height));
             Float heightacc = receive.getFloatExtra("Heightacc",0F);
             mHeightaccText.setText(String.format(Locale.getDefault(),"%.1f m",heightacc));
-            Float stepstoday = receive.getFloatExtra("Stepstoday",0F);
+            float stepstoday = receive.getFloatExtra("Stepstoday",0F);
             mStepDailyText.setText(String.format(Locale.getDefault(),"%.0f",stepstoday));
             // set progress bars
-            int dailysteps = Integer.valueOf(mSettings.getString(cPREF_TARGET_STEPS, "100000"));
+            int dailysteps = Integer.parseInt(Objects.requireNonNull(mSettings.getString(cPREF_TARGET_STEPS, "100000")));
             // dailysteps can be set to zero, we must avoid division by zero when stepstoday is wrongly set to negative
             if (stepstoday < dailysteps  && stepstoday >= 0) {
                 // difficult to read, bar color sufficient: mStepDailyText.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
@@ -325,9 +328,9 @@ public class MainActivity extends AppCompatActivity {
                 mStepDailyProgress.setProgressTintList(
                         ColorStateList.valueOf(ContextCompat.getColor(context,R.color.colorPrimaryDark)));
             }
-            Float heighttoday = receive.getFloatExtra("Heighttoday",0F);
+            float heighttoday = receive.getFloatExtra("Heighttoday",0F);
             mHeightDailyText.setText(String.format(Locale.getDefault(),"%.1f m",heighttoday));
-            int dailyheight = Integer.valueOf(mSettings.getString(cPREF_TARGET_HEIGHT, "100"));
+            int dailyheight = Integer.parseInt(Objects.requireNonNull(mSettings.getString(cPREF_TARGET_HEIGHT, "100")));
             // see above
             if (heighttoday < dailyheight && heighttoday >=0 ) {
                 // difficult to read, bar color sufficient: mHeightDailyText.setTextColor(ContextCompat.getColor(context, R.color.colorAccent));
@@ -372,24 +375,20 @@ public class MainActivity extends AppCompatActivity {
     // this is the callback if permission dialog is ended - we just save the result for later
     @Override
     public void onRequestPermissionsResult(
-            int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case 1: {
+            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 1) {// If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this, R.string.permission_sdcard_granted,
+                        Toast.LENGTH_SHORT).show();
+                SharedPreferences.Editor editpref =
+                        PreferenceManager.getDefaultSharedPreferences(this).edit();
+                editpref.putBoolean("mReqSDPermission", false);
+                editpref.apply();
 
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(MainActivity.this, R.string.permission_sdcard_granted,
-                            Toast.LENGTH_SHORT).show();
-                    SharedPreferences.Editor editpref =
-                            PreferenceManager.getDefaultSharedPreferences(this).edit();
-                    editpref.putBoolean("mReqSDPermission",false);
-                    editpref.apply();
-
-                } else {
-                    Toast.makeText(MainActivity.this, R.string.cant_write_sdcard,
-                            Toast.LENGTH_SHORT).show();
-                }
+            } else {
+                Toast.makeText(MainActivity.this, R.string.cant_write_sdcard,
+                        Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -399,6 +398,7 @@ public class MainActivity extends AppCompatActivity {
         Set<String> detail_multi = mSettings.getStringSet(cPREF_STAT_DETAIL_MULTI, cPREF_STAT_DETAIL_MULTI_DEFAULT);
 
         boolean ret = false;
+        assert detail_multi != null;
         for (String s:  detail_multi ) {
             ret = ret || s.equals(identifier);
         }

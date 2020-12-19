@@ -7,8 +7,10 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
-import android.preference.PreferenceManager;
+import androidx.preference.PreferenceManager;
 import android.widget.Toast;
+
+import java.util.Objects;
 
 import static grmpl.mk.stepandheightcounter.Constants.*;
 
@@ -68,7 +70,7 @@ public class SettingsActivity extends PreferenceActivity{
                             type = cSTAT_TYPE_DAILY;
                     }
                     //  Value of 0 will not be accepted for max number of files
-                    if ( Integer.valueOf(value.toString()) < 1 ) {
+                    if ( Integer.parseInt(value.toString()) < 1 ) {
                         new AlertDialog.Builder(getActivity())
                                 .setTitle(R.string.alert_title_zero_num)
                                 .setMessage(R.string.alert_message_zero_num)
@@ -81,7 +83,7 @@ public class SettingsActivity extends PreferenceActivity{
                         return false;
                     }
                     // if value is smaller than before and autoclean on, make AlertDialog and delete files
-                    else if ( Integer.valueOf(settings.getString( key, "999")) > newnumber && autocleanon){
+                    else if ( Integer.parseInt(Objects.requireNonNull(settings.getString(key, "999"))) > newnumber && autocleanon){
                         new AlertDialog.Builder(getActivity())
                                 .setTitle(R.string.alert_title_autoclean_change)
                                 .setMessage(R.string.alert_message_autoclean_changed)

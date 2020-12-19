@@ -17,12 +17,16 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.PowerManager;
-import android.preference.PreferenceManager;
+
+import androidx.core.app.NotificationCompat;
+import androidx.preference.PreferenceManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -98,7 +102,7 @@ public class SensorService extends Service {
     // ** Subclasses and arrays **
 
     // remember pressure for correlation
-    private class         mPressureHistory{
+    private static class         mPressureHistory{
         float             pressure;
         long              timestamp; //nanoseconds
         mPressureHistory(float p, long t){
@@ -191,7 +195,8 @@ public class SensorService extends Service {
         mSave.saveDebugStatus("Start measurement requested");
         if (!mRegistered) {
             // this must finish, so request a wakelock
-            PowerManager.WakeLock wakelock = mPowerManger.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "START");
+            PowerManager.WakeLock wakelock
+                    = mPowerManger.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "stepandheightcounter:START");
             wakelock.acquire(cWAKELOCK_ALARM); //that should be more than enough - we will release it
 
             // Build an intent for starting our MainActivity from notification
@@ -202,7 +207,7 @@ public class SensorService extends Service {
             // Create pendingIntent which can be given to notification builder
             mPIntentActivity = PendingIntent.getActivity(this, 0, nIntent, 0);
             // back stack creation seems not to be necessary (would it even be possible from service?)
-            Notification noti = new Notification.Builder(this)
+            Notification noti = new NotificationCompat.Builder(this, cCHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_walkinsteps)
                     .setContentTitle(getString(R.string.app_name))
                     .setContentText(getString(R.string.step_is_counting))
@@ -243,7 +248,7 @@ public class SensorService extends Service {
         else return true;
     }
 
-    int stopListeners() {
+    void stopListeners() {
         savePersistent();
 
         mSave.saveDebugStatus("Stopping measurement");
@@ -280,7 +285,6 @@ public class SensorService extends Service {
         // Now we don't care if we are killed
         stopForeground(true);
 
-        return 0;
     }
 
 
@@ -311,7 +315,7 @@ public class SensorService extends Service {
        So the best way should be to use a post of a runnable and additionally check for delayed
         pressure and wait for delivery.
      */
-    private boolean correlateSensorEvents() {
+    private void correlateSensorEvents() {
         // save actual size of list in variable, just to be sure it wouldn't be changed
         //  (shouldn't be necessary, but could be with async processing)
         int limit = mStepHistoryList.size(), calcindex;
@@ -329,7 +333,7 @@ public class SensorService extends Service {
             //  a timestamp after the step sensor event, as pressure sensor events are  delivered continuously
             if (values.steptimestamp > (mPressureHistoryList.get(highindex).timestamp)) {
                 mSave.saveDebugStatus("No actual pressure value, putting additional task in queue 2 seconds later");
-                Handler handler = new Handler();
+                Handler handler = new Handler(Looper.getMainLooper());
                 handler.postDelayed(this::correlateSensorEvents, cDELAY_CORRELATION);
                 /* was
                 handler.postDelayed(new Runnable() {
@@ -447,7 +451,7 @@ public class SensorService extends Service {
                         mStepsCumul[0], mHeightCumul[0], height, cSTAT_TYPE_SENS);
 
             // Update Notification, put actual values in it
-            Notification noti = new Notification.Builder(this)
+            Notification noti = new NotificationCompat.Builder(this, cCHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_walkinsteps)
                     .setContentTitle(getString(R.string.app_name))
                     .setContentText(getString(R.string.steps) + ": "
@@ -463,9 +467,9 @@ public class SensorService extends Service {
             Intent callback = new Intent();
             callback.setAction("grmpl.mk.stepandheighcounter.custom.intent.Callback");
             if (mSettings.getBoolean(cPREF_DEBUG, false)) {
-                String outtext = getString(R.string.out_stat_listlength) + Integer.toString(mStepHistoryList.size()) + "\n";
-                outtext = outtext + getString(R.string.out_stat_pressure) + Float.toString(pressure) + "\n";
-                outtext = outtext + getString(R.string.out_stat_referenceheight) + Float.toString(mHeightRef) + "\n";
+                String outtext = getString(R.string.out_stat_listlength) + mStepHistoryList.size() + "\n";
+                outtext = outtext + getString(R.string.out_stat_pressure) + pressure + "\n";
+                outtext = outtext + getString(R.string.out_stat_referenceheight) + mHeightRef + "\n";
                 callback.putExtra("Status", outtext);
             } else callback.putExtra("Status", " ");
             callback.putExtra("Steps", mStepsCumul[0]);
@@ -478,8 +482,8 @@ public class SensorService extends Service {
 
         }
 
-        mSave.saveDebugStatus("correlation loop finished, " + Integer.toString(calcindex) +
-                "/" + Integer.toString(limit) +
+        mSave.saveDebugStatus("correlation loop finished, " + calcindex +
+                "/" + limit +
                 ") items processed");
             /* make sure we are registered to the significant motion wakeup sensor
                 If we just do this from the end of the triggered method, the registration can
@@ -493,7 +497,6 @@ public class SensorService extends Service {
         mSensorManager.cancelTriggerSensor(mMotionListener, mMotion);
         mSensorManager.requestTriggerSensor(mMotionListener, mMotion);
         mSave.saveDebugStatus("Register to significant motion sensor from correlation task");
-        return true;
 
     }
 
@@ -506,7 +509,7 @@ public class SensorService extends Service {
         public void onTrigger(TriggerEvent triggerEvent) {
             PowerManager.WakeLock wakelock;
             // do nothing, just acquire wakelock to let sensor events come through
-            wakelock = mPowerManger.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SIGNIFICANT_MOTION");
+            wakelock = mPowerManger.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "stepandheightcounter:SIGNIFICANT_MOTION");
             wakelock.acquire(cWAKELOCK_TRIGGER); //acquire for 30sec - this should not be a single move only
             mSave.saveDebugStatus("Wake up from trigger");
             mSensorManager.flush(mSensorBarListener);
@@ -529,7 +532,7 @@ public class SensorService extends Service {
                 // first event
                 if (mPressStartTimestamp == 0){
                     // get a wakelock, we have to finish this
-                    mWakelockSettle = mPowerManger.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"SENSOR_SETTLE");
+                    mWakelockSettle = mPowerManger.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"stepandheightcounter:SENSOR_SETTLE");
                     mWakelockSettle.acquire(cWAKELOCK_SETTLE_PRESSURE);
                     mSave.saveDebugStatus("First pressure value, waiting 1 sec for sensor to settle down");
                     mPressStartTimestamp = sensorEvent.timestamp;
@@ -613,7 +616,7 @@ public class SensorService extends Service {
                 mStepsSensBefore = stepsact;
                 mStepSensorValues data = new mStepSensorValues(steptimestamp, stepsact);
                 mStepHistoryList.add(data);
-                Handler handler = new Handler();
+                Handler handler = new Handler(Looper.getMainLooper());
                 handler.postDelayed(SensorService.this::correlateSensorEvents,cDELAY_CORRELATION_FIRST);
                 /* was
                 handler.postDelayed(new Runnable() {
@@ -635,7 +638,7 @@ public class SensorService extends Service {
                 mStepHistoryList.add(data);
                 // and remember it for next check
                 mStepsSensBefore = stepsact;
-                Handler handler = new Handler();
+                Handler handler = new Handler(Looper.getMainLooper());
                 handler.postDelayed(SensorService.this::correlateSensorEvents,cDELAY_CORRELATION_FIRST);
                 /* was
                 handler.postDelayed(new Runnable() {
@@ -700,9 +703,9 @@ public class SensorService extends Service {
         callback.setAction("grmpl.mk.stepandheighcounter.custom.intent.Callback");
 
         if (mSettings.getBoolean(cPREF_DEBUG, false)) {
-            String outtext = getString(R.string.out_stat_listlength) + Integer.toString(mStepHistoryList.size()) + "\n";
-            outtext = outtext + getString(R.string.out_stat_pressure) + Float.toString(mPressure) + "\n";
-            outtext = outtext + getString(R.string.out_stat_referenceheight) + Float.toString(mHeightRef) + "\n";
+            String outtext = getString(R.string.out_stat_listlength) + mStepHistoryList.size() + "\n";
+            outtext = outtext + getString(R.string.out_stat_pressure) + mPressure + "\n";
+            outtext = outtext + getString(R.string.out_stat_referenceheight) + mHeightRef + "\n";
             callback.putExtra("Status", outtext);
         } else callback.putExtra("Status", " ");
         callback.putExtra("Steps",mStepsCumul[0]);
@@ -718,6 +721,7 @@ public class SensorService extends Service {
     private boolean getDetailSave(String identifier){
         Set<String> detail_multi = mSettings.getStringSet(cPREF_STAT_DETAIL_MULTI, cPREF_STAT_DETAIL_MULTI_DEFAULT);
 
+        assert detail_multi != null;
         for (String s:  detail_multi ) {
             if ( s.equals(identifier) ) return true;
         }
@@ -796,7 +800,7 @@ public class SensorService extends Service {
             if (mSettings.getBoolean(cPREF_STAT_HOUR, false)){
                 // get the interval duration for regular statistics
                 //  int would be enough, but careful casting would be necessary
-                long interval_msec = Integer.valueOf(mSettings.getString(cPREF_STAT_HOUR_MIN, "30")) * 60 * 1000;
+                long interval_msec = Integer.parseInt(Objects.requireNonNull(mSettings.getString(cPREF_STAT_HOUR_MIN, "30"))) * 60 * 1000;
                 long evtint = mEvtTimestampMilliSec / interval_msec; // integer-division: correct sequence is necessary!
                 long currint = acttimestamp_msec / interval_msec;
                 // if we have values from previous interval, last interval is finished, we can save them
