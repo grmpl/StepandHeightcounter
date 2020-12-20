@@ -65,7 +65,9 @@
     <string name="pref_stat_hour_list_2">1/2 hour</string>
     <string name="pref_stat_hour_list_3">1 hour</string>
     <string name="cant_write_sdcard">Can\'t write to SD-Card!</string>
+    <string name="cant_activity_recognition">Can\'t use this app without Activity Recognition!</string>
     <string name="permission_sdcard_granted">Permission for SD Card granted</string>
+    <string name="permission_ar_granted">Permission for Activity Recognition granted</string>
     <string name="no_write_sdcard_settings_disbled">Can\'t write to SD Card. Write settings disabled.</string>
     <string name="daily_steps">Steps today:</string>
     <string name="height_today">Height today:</string>

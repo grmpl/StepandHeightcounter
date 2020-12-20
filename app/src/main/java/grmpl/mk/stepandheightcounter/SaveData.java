@@ -311,10 +311,6 @@ class SaveData {
 
     // central point for directory
     private File getDirectory(){
-        // TODO:
-        //  https://stackoverflow.com/questions/57116335/environment-getexternalstoragedirectory-deprecated-in-api-level-29-java
-        //  https://developer.android.com/reference/android/content/Context#getExternalFilesDir(java.lang.String)
-        //  https://stackoverflow.com/questions/65125446/cannot-resolve-method-getexternalfilesdir
         String temp =  Objects.requireNonNull(mContext.getExternalFilesDir(cDIRECTORY)).toString();// + File.separator + cDIRECTORY;
         return new File(temp);
     }

@@ -11,6 +11,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -57,6 +58,86 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences mSettings;
     private SaveData mSave;
 
+    // https://stackoverflow.com/questions/42941662/request-permissions-in-main-activity
+    public static final int MULTIPLE_PERMISSIONS = 100;
+
+    private void checkPermission() {
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.ACTIVITY_RECOGNITION)
+                + ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale
+                    (MainActivity.this, Manifest.permission.ACTIVITY_RECOGNITION) ||
+                    ActivityCompat.shouldShowRequestPermissionRationale
+                            (MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    requestPermissions(
+                            new String[]{Manifest.permission.ACTIVITY_RECOGNITION,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            MULTIPLE_PERMISSIONS);
+                }
+
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    requestPermissions(
+                            new String[]{Manifest.permission.ACTIVITY_RECOGNITION,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            MULTIPLE_PERMISSIONS);
+                }
+            }
+        } else {
+            // put your function here
+
+        }
+    }
+
+    // this is the callback if permission dialog is ended - we just save the result for later
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MULTIPLE_PERMISSIONS:
+                if (grantResults.length > 0) {
+                    boolean activityPermission = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                    boolean writeExternalFile = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+
+                    if(writeExternalFile) {
+                        Toast.makeText(MainActivity.this, R.string.permission_sdcard_granted,
+                                Toast.LENGTH_SHORT).show();
+                        SharedPreferences.Editor editpref =
+                                PreferenceManager.getDefaultSharedPreferences(this).edit();
+                        editpref.putBoolean("mReqSDPermission", false);
+                        editpref.apply();
+                    } else {
+                        Toast.makeText(MainActivity.this, R.string.cant_write_sdcard,
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    if(activityPermission)
+                    {
+                        Toast.makeText(MainActivity.this, R.string.permission_ar_granted,
+                                Toast.LENGTH_SHORT).show();
+                        SharedPreferences.Editor editpref =
+                                PreferenceManager.getDefaultSharedPreferences(this).edit();
+                        editpref.putBoolean("mReqActivityRecognitionPermission", false);
+                        editpref.apply();
+                    } else {
+                        Toast.makeText(MainActivity.this, R.string.cant_activity_recognition,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        requestPermissions(
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                        Manifest.permission.ACTIVITY_RECOGNITION},
+                                MULTIPLE_PERMISSIONS);
+                    }
+                }
+
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +145,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Request permissions
+        checkPermission();
 
         // Access to persistent data
         mSettings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -295,7 +379,6 @@ public class MainActivity extends AppCompatActivity {
     public class MyReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent receive){
-            System.out.println("sudeep: reciever recieved...");
             // set all output fields
             String outtext = receive.getStringExtra("Status");
             mStatusText.setText(outtext);
@@ -353,7 +436,6 @@ public class MainActivity extends AppCompatActivity {
 
             // set Start/Stop-Button
             mRunning = receive.getBooleanExtra("Registered",false);
-            System.out.println("sudeep: val: mRunning:" + mRunning);
 
             if(mRunning){
                 mStartButton.setText(R.string.button_running);
@@ -372,27 +454,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-    }
-
-    // this is the callback if permission dialog is ended - we just save the result for later
-    @Override
-    public void onRequestPermissionsResult(
-            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 1) {// If request is cancelled, the result arrays are empty.
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(MainActivity.this, R.string.permission_sdcard_granted,
-                        Toast.LENGTH_SHORT).show();
-                SharedPreferences.Editor editpref =
-                        PreferenceManager.getDefaultSharedPreferences(this).edit();
-                editpref.putBoolean("mReqSDPermission", false);
-                editpref.apply();
-
-            } else {
-                Toast.makeText(MainActivity.this, R.string.cant_write_sdcard,
-                        Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     // checking what values have to be saved in detail statistics

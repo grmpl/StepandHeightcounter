@@ -195,7 +195,6 @@ public class SensorService extends Service {
 
     // ** Start/Stop measuring **
     boolean startListeners() {
-        System.out.println("sudeep: starting measurement...");
         mSave.saveDebugStatus("Start measurement requested");
         if (!mRegistered) {
             // this must finish, so request a wakelock
@@ -264,7 +263,6 @@ public class SensorService extends Service {
     }
 
     void stopListeners() {
-        System.out.println("sudeep: stopping measurement...");
         savePersistent();
 
         mSave.saveDebugStatus("Stopping measurement");
@@ -347,6 +345,7 @@ public class SensorService extends Service {
 
             // check if all pressure events have been delivered - the last one must have
             //  a timestamp after the step sensor event, as pressure sensor events are  delivered continuously
+            // TODO: possible ArrayIndexOutOfBounds on quick start/stop
             if (values.steptimestamp > (mPressureHistoryList.get(highindex).timestamp)) {
                 mSave.saveDebugStatus("No actual pressure value, putting additional task in queue 2 seconds later");
                 Handler handler = new Handler(Looper.getMainLooper());
@@ -578,7 +577,6 @@ public class SensorService extends Service {
                     // register StepSensor
                     boolean succ = mSensorManager.registerListener(mSensorStepListener, mStepSensor,
                             SensorManager.SENSOR_DELAY_NORMAL);
-                    System.out.println("sudeep: val: succ:" + succ);
                     if (!succ){
                         Intent callback = new Intent();
                         callback.setAction("grmpl.mk.stepandheighcounter.custom.intent.Callback");
