@@ -7,12 +7,12 @@
             android:key="pref_target_steps"
             android:title="@string/steps"
             android:defaultValue="10000"
-            android:numeric="integer" />
+            android:inputType="number" />
         <EditTextPreference
             android:key="pref_target_height"
             android:title="@string/height"
             android:defaultValue="100"
-            android:numeric="integer" />
+            android:inputType="number" />
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -39,7 +39,7 @@
             android:title="@string/pref_title_stat_clear_num"
             android:summary="@string/pref_stat_clear_num_sum"
             android:defaultValue="7"
-            android:numeric="integer" />
+            android:inputType="number" />
         <CheckBoxPreference
             android:key="pref_stat_hour"
             android:title="@string/pref_title_stat_hour"
@@ -63,7 +63,7 @@
             android:title="@string/pref_title_stat_clear_num"
             android:summary="@string/pref_stat_clear_num_sum"
             android:defaultValue="15"
-            android:numeric="integer" />
+            android:inputType="number" />
         <CheckBoxPreference
             android:key="pref_stat_daily"
             android:title="@string/pref_title_stat_daily"
@@ -74,7 +74,7 @@
 
     <PreferenceCategory
         android:title="@string/pref_cat_deb"
-        android:key="pref_cat_stat">
+        android:key="pref_cat_stat_debug">
     <CheckBoxPreference
         android:key="pref_debug"
         android:title="@string/pref_title_debug"

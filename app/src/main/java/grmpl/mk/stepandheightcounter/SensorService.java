@@ -1,12 +1,14 @@
 package grmpl.mk.stepandheightcounter;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,6 +16,7 @@ import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -192,6 +195,7 @@ public class SensorService extends Service {
 
     // ** Start/Stop measuring **
     boolean startListeners() {
+        System.out.println("sudeep: starting measurement...");
         mSave.saveDebugStatus("Start measurement requested");
         if (!mRegistered) {
             // this must finish, so request a wakelock
@@ -206,6 +210,17 @@ public class SensorService extends Service {
             nIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             // Create pendingIntent which can be given to notification builder
             mPIntentActivity = PendingIntent.getActivity(this, 0, nIntent, 0);
+
+            // https://stackoverflow.com/questions/47531742/startforeground-fail-after-upgrade-to-android-8-1
+            // https://stackoverflow.com/questions/53815261/bad-notification-for-startforeground
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel chan = new NotificationChannel(cCHANNEL_ID, cCHANNEL_NAME, NotificationManager.IMPORTANCE_NONE);
+                chan.setLightColor(Color.BLUE);
+                chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+
+                mNotificationManager.createNotificationChannel(chan);
+            }
+
             // back stack creation seems not to be necessary (would it even be possible from service?)
             Notification noti = new NotificationCompat.Builder(this, cCHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_walkinsteps)
@@ -249,6 +264,7 @@ public class SensorService extends Service {
     }
 
     void stopListeners() {
+        System.out.println("sudeep: stopping measurement...");
         savePersistent();
 
         mSave.saveDebugStatus("Stopping measurement");
@@ -450,6 +466,16 @@ public class SensorService extends Service {
                 mSave.saveStatistics(mEvtTimestampMilliSec,
                         mStepsCumul[0], mHeightCumul[0], height, cSTAT_TYPE_SENS);
 
+            // https://stackoverflow.com/questions/47531742/startforeground-fail-after-upgrade-to-android-8-1
+            // https://stackoverflow.com/questions/53815261/bad-notification-for-startforeground
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel chan = new NotificationChannel(cCHANNEL_ID, cCHANNEL_NAME, NotificationManager.IMPORTANCE_NONE);
+                chan.setLightColor(Color.BLUE);
+                chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+
+                mNotificationManager.createNotificationChannel(chan);
+            }
+
             // Update Notification, put actual values in it
             Notification noti = new NotificationCompat.Builder(this, cCHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_walkinsteps)
@@ -499,7 +525,6 @@ public class SensorService extends Service {
         mSave.saveDebugStatus("Register to significant motion sensor from correlation task");
 
     }
-
 
     // ** Listeners for sensors **
 
@@ -553,6 +578,7 @@ public class SensorService extends Service {
                     // register StepSensor
                     boolean succ = mSensorManager.registerListener(mSensorStepListener, mStepSensor,
                             SensorManager.SENSOR_DELAY_NORMAL);
+                    System.out.println("sudeep: val: succ:" + succ);
                     if (!succ){
                         Intent callback = new Intent();
                         callback.setAction("grmpl.mk.stepandheighcounter.custom.intent.Callback");

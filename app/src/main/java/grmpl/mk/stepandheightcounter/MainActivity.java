@@ -295,6 +295,7 @@ public class MainActivity extends AppCompatActivity {
     public class MyReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent receive){
+            System.out.println("sudeep: reciever recieved...");
             // set all output fields
             String outtext = receive.getStringExtra("Status");
             mStatusText.setText(outtext);
@@ -352,6 +353,7 @@ public class MainActivity extends AppCompatActivity {
 
             // set Start/Stop-Button
             mRunning = receive.getBooleanExtra("Registered",false);
+            System.out.println("sudeep: val: mRunning:" + mRunning);
 
             if(mRunning){
                 mStartButton.setText(R.string.button_running);

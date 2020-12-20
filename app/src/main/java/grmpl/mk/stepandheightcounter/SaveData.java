@@ -2,7 +2,6 @@ package grmpl.mk.stepandheightcounter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Environment;
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.EditTextPreference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -241,7 +240,7 @@ class SaveData {
             case cSTAT_TYPE_REGULAR:
                 keep = Integer.parseInt(Objects.requireNonNull(settings.getString(cPREF_STAT_HOUR_CLEAR_NUM, "9999")));
                 // We got the fragment, so we can change the preference directly
-                CheckBoxPreference box1 = (CheckBoxPreference) fragment.findPreference(cPREF_STAT_HOUR_CLEAR);
+                CheckBoxPreference box1 = fragment.findPreference(cPREF_STAT_HOUR_CLEAR);
                 assert box1 != null;
                 box1.setChecked(true);
                 deleteFiles(type, keep);
@@ -250,7 +249,7 @@ class SaveData {
             default:
                 keep = Integer.parseInt(Objects.requireNonNull(settings.getString(cPREF_STAT_DETAIL_CLEAR_NUM, "9999")));
                 // We got the fragment, so we can change the preference directly
-                CheckBoxPreference box2 = (CheckBoxPreference) fragment.findPreference(cPREF_STAT_DETAIL_CLEAR);
+                CheckBoxPreference box2 = fragment.findPreference(cPREF_STAT_DETAIL_CLEAR);
                 assert box2 != null;
                 box2.setChecked(true);
                 deleteFiles(type, keep);
@@ -268,7 +267,7 @@ class SaveData {
             // for regular statistics
             case cSTAT_TYPE_REGULAR:
                 // We got the fragment, so we can change the preference directly
-                EditTextPreference text1 = (EditTextPreference) fragment.findPreference(cPREF_STAT_HOUR_CLEAR_NUM);
+                EditTextPreference text1 = fragment.findPreference(cPREF_STAT_HOUR_CLEAR_NUM);
                 assert text1 != null;
                 text1.setText(Integer.toString(number));
                 deleteFiles(type,number);
@@ -276,7 +275,7 @@ class SaveData {
             // for detailed statistics
             default:
                 // We got the fragment, so we can change the preference directly
-                EditTextPreference text2 = (EditTextPreference) fragment.findPreference(cPREF_STAT_DETAIL_CLEAR_NUM);
+                EditTextPreference text2 = fragment.findPreference(cPREF_STAT_DETAIL_CLEAR_NUM);
                 assert text2 != null;
                 text2.setText(Integer.toString(number));
                 deleteFiles(type, number);
@@ -316,7 +315,7 @@ class SaveData {
         //  https://stackoverflow.com/questions/57116335/environment-getexternalstoragedirectory-deprecated-in-api-level-29-java
         //  https://developer.android.com/reference/android/content/Context#getExternalFilesDir(java.lang.String)
         //  https://stackoverflow.com/questions/65125446/cannot-resolve-method-getexternalfilesdir
-        String temp =  Environment.getExternalStorageDirectory() + File.separator + cDIRECTORY;
+        String temp =  Objects.requireNonNull(mContext.getExternalFilesDir(cDIRECTORY)).toString();// + File.separator + cDIRECTORY;
         return new File(temp);
     }
 
