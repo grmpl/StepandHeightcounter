@@ -20,7 +20,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         // acquire wakelock to work on the messages in handler queue
         //  as we don't know, when work is finished, we just acquire it for some time
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ALARM");
+        wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "stepandheightcounter:ALARM");
 
         wakelock.acquire(cWAKELOCK_ALARM);
 

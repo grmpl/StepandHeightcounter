@@ -3,42 +3,42 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceGroup;
-import android.preference.PreferenceManager;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceGroup;
+import androidx.preference.PreferenceManager;
 import android.widget.Toast;
+
+import java.util.Objects;
 
 import static grmpl.mk.stepandheightcounter.Constants.*;
 
-public class SettingsActivity extends PreferenceActivity{
+public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
-
-
-
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(android.R.id.content, new MyPreferenceFragment())
+                .commit();
     }
 
-    public static class MyPreferenceFragment extends PreferenceFragment
+    public static class MyPreferenceFragment extends PreferenceFragmentCompat
     {
         @Override
-        public void onCreate(final Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
-            final PreferenceFragment mFragment = this;
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+            setPreferencesFromResource(R.xml.preferences, rootKey);
 
+            final PreferenceFragmentCompat mFragment = this;
 
-            addPreferencesFromResource(R.xml.preferences);
             // disable settings if there is no write access to SDCard
             if (!(new CheckSDCard(getActivity()).checkWriteSDCard())) {
                 // Disable all write settings
-                PreferenceGroup preferenceGroup = (PreferenceGroup) findPreference("pref_cat_stat");
-                preferenceGroup.setEnabled(false);
-                preferenceGroup = (PreferenceGroup) findPreference("pref_cat_stat");
+                PreferenceGroup preferenceGroup = findPreference("pref_cat_stat");
+                assert preferenceGroup != null;
                 preferenceGroup.setEnabled(false);
                 Toast.makeText(getActivity(), R.string.no_write_sdcard_settings_disbled, Toast.LENGTH_LONG).show();
             }
@@ -50,9 +50,9 @@ public class SettingsActivity extends PreferenceActivity{
             Preference.OnPreferenceChangeListener changelistenernum =  new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object value) {
-                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(requireActivity());
                     String key = preference.getKey();
-                    final int newnumber = Integer.valueOf(value.toString());
+                    final int newnumber = Integer.parseInt(value.toString());
                     final String type;
                     boolean autocleanon = true;
                     switch (key) {
@@ -68,7 +68,7 @@ public class SettingsActivity extends PreferenceActivity{
                             type = cSTAT_TYPE_DAILY;
                     }
                     //  Value of 0 will not be accepted for max number of files
-                    if ( Integer.valueOf(value.toString()) < 1 ) {
+                    if ( Integer.parseInt(value.toString()) < 1 ) {
                         new AlertDialog.Builder(getActivity())
                                 .setTitle(R.string.alert_title_zero_num)
                                 .setMessage(R.string.alert_message_zero_num)
@@ -81,7 +81,7 @@ public class SettingsActivity extends PreferenceActivity{
                         return false;
                     }
                     // if value is smaller than before and autoclean on, make AlertDialog and delete files
-                    else if ( Integer.valueOf(settings.getString( key, "999")) > newnumber && autocleanon){
+                    else if ( Integer.parseInt(Objects.requireNonNull(settings.getString(key, "999"))) > newnumber && autocleanon){
                         new AlertDialog.Builder(getActivity())
                                 .setTitle(R.string.alert_title_autoclean_change)
                                 .setMessage(R.string.alert_message_autoclean_changed)

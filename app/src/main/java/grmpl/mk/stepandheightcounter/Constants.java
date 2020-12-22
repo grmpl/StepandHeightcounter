@@ -25,6 +25,11 @@ final class Constants {
     // Notification ID
     static final int cNOTIID = 1111;
 
+    // Notification Channel ID
+    final static String cCHANNEL_ID = "step_height_channel";
+
+    final static String cCHANNEL_NAME = "step_height_channel_service";
+
     // Preferences
     final static String cPREF_DEBUG = "pref_debug";
     final static String cPREF_TARGET_STEPS = "pref_target_steps";

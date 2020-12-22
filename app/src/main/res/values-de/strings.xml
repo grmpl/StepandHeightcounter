@@ -54,8 +54,10 @@
     <string name="pref_stat_hour_list_2">1/2 Stunde</string>
     <string name="pref_stat_hour_list_3">1 Stunde</string>
     <string name="cant_write_sdcard">SD-Card ist nicht beschreibbar!</string>
+    <string name="cant_activity_recognition">Diese App ist ohne Aktivitätserkennung nicht zu gebrauchen!</string>
     <string name="no_write_sdcard_settings_disbled">SD-Card nicht beschreibbar, Einstellungen zum Schreiben deaktiviert.</string>
     <string name="permission_sdcard_granted">Zulassung zum Schreiben auf SD-Karte erhalten.</string>
+    <string name="permission_ar_granted">Zulassung zum Schreiben auf Aktivität Erkennung erhalten.</string>
     <string name="height_init1">999 m</string>
     <string name="pref_title_debug">Debug-Ausgaben</string>
     <string name="daily_steps">Schritte heute:</string>

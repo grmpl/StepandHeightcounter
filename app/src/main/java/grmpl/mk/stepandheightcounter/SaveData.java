@@ -2,11 +2,10 @@ package grmpl.mk.stepandheightcounter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Environment;
-import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
+import androidx.preference.CheckBoxPreference;
+import androidx.preference.EditTextPreference;
+import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 import static grmpl.mk.stepandheightcounter.Constants.*;
 
@@ -75,7 +75,7 @@ class SaveData {
 
     // saving detailed information for debugging purposes
     //  (check for activation is done in call, to avoid unnecessary method call)
-    int saveDebugValues(String valueline) {
+    void saveDebugValues(String valueline) {
         /* Debugging:
         saveDebugStatus(dStr.toString());
         */
@@ -87,7 +87,7 @@ class SaveData {
             File directory = getDirectory();
             if (!directory.exists()) {
                 if (!directory.mkdirs()) {
-                    return -1;
+                    return;
                 }
             }
 
@@ -109,10 +109,8 @@ class SaveData {
                 }
 
                 out.close();
-                return 0;
             } catch (Exception e) {
                 saveDebugStatus(e.getMessage());
-                return -2;
             } finally {
                 try {
                     assert out != null;
@@ -122,20 +120,19 @@ class SaveData {
                 }
             }
         }
-        else return -3;
     }
 
 
     // Saving statistics - one method with height information, one without
-    int saveStatistics(long timems, float stepscumul, float heightcumul, float height, String type) {
-        return saveStatistics(timems,stepscumul,heightcumul,height,type,true);
+    void saveStatistics(long timems, float stepscumul, float heightcumul, float height, String type) {
+        saveStatistics(timems, stepscumul, heightcumul, height, type, true);
     }
 
-    int saveStatistics(long timems, float stepscumul, float heightcumul, String type) {
-        return saveStatistics(timems,stepscumul,heightcumul, -9997, type, false);
+    void saveStatistics(long timems, float stepscumul, float heightcumul, String type) {
+        saveStatistics(timems, stepscumul, heightcumul, -9997, type, false);
     }
 
-    private int saveStatistics(long timems, float stepscumul, float heightcumul, float height, String type, boolean heightout) {
+    private void saveStatistics(long timems, float stepscumul, float heightcumul, float height, String type, boolean heightout) {
         if(mCheckSDCard.checkWriteSDCard()) {
             SimpleDateFormat sdformat, sdformati;
             final String filenamet;
@@ -157,7 +154,7 @@ class SaveData {
                     sdformat = new SimpleDateFormat("yyyyMMdd", Locale.US);
                     sdformati = new SimpleDateFormat("yyyy-MM-dd HH:mm, zzz", Locale.US); //seconds not needed
                     autoclean = settings.getBoolean(cPREF_STAT_HOUR_CLEAR, false);
-                    keep = Integer.valueOf(settings.getString(cPREF_STAT_HOUR_CLEAR_NUM, "9999"));
+                    keep = Integer.parseInt(Objects.requireNonNull(settings.getString(cPREF_STAT_HOUR_CLEAR_NUM, "9999")));
                     // to save the last interval not at next day 0:00, but on this day 24:00 we adjust the time a little bit
                     timems = timems - 1;
                     break;
@@ -166,7 +163,7 @@ class SaveData {
                     sdformat = new SimpleDateFormat("yyyyMMdd", Locale.US);
                     sdformati = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss, zzz", Locale.US); // fixed formatting, not local formatting
                     autoclean = settings.getBoolean(cPREF_STAT_DETAIL_CLEAR, false);
-                    keep = Integer.valueOf(settings.getString(cPREF_STAT_DETAIL_CLEAR_NUM, "9999"));
+                    keep = Integer.parseInt(Objects.requireNonNull(settings.getString(cPREF_STAT_DETAIL_CLEAR_NUM, "9999")));
             }
 
             filenamet = getFilenameEnding(type);
@@ -174,7 +171,7 @@ class SaveData {
 
             if (!directory.exists()) {
                 if (!directory.mkdirs()) {
-                    return -1;
+                    return;
                 }
             }
 
@@ -217,10 +214,8 @@ class SaveData {
                 }
 
                 out.close();
-                return 0;
             } catch (Exception e) {
                 saveDebugStatus(e.getMessage());
-                return -2;
             } finally {
                 try {
                     assert out != null;
@@ -230,11 +225,10 @@ class SaveData {
                 }
             }
         }
-        else return -3;
     }
 
     // If AlertDialog was ended with "Yes", we set the Checkbox for Autoclean and delete old files
-    void saveClearOnAndDelete(String type, PreferenceFragment fragment){
+    void saveClearOnAndDelete(String type, PreferenceFragmentCompat fragment){
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
         int keep;
         switch (type) {
@@ -244,17 +238,19 @@ class SaveData {
                 break;
             // for regular statistics
             case cSTAT_TYPE_REGULAR:
-                keep = Integer.valueOf(settings.getString(cPREF_STAT_HOUR_CLEAR_NUM, "9999"));
+                keep = Integer.parseInt(Objects.requireNonNull(settings.getString(cPREF_STAT_HOUR_CLEAR_NUM, "9999")));
                 // We got the fragment, so we can change the preference directly
-                CheckBoxPreference box1 = (CheckBoxPreference) fragment.findPreference(cPREF_STAT_HOUR_CLEAR);
+                CheckBoxPreference box1 = fragment.findPreference(cPREF_STAT_HOUR_CLEAR);
+                assert box1 != null;
                 box1.setChecked(true);
                 deleteFiles(type, keep);
                 break;
             // for detailed statistics
             default:
-                keep = Integer.valueOf(settings.getString(cPREF_STAT_DETAIL_CLEAR_NUM, "9999"));
+                keep = Integer.parseInt(Objects.requireNonNull(settings.getString(cPREF_STAT_DETAIL_CLEAR_NUM, "9999")));
                 // We got the fragment, so we can change the preference directly
-                CheckBoxPreference box2 = (CheckBoxPreference) fragment.findPreference(cPREF_STAT_DETAIL_CLEAR);
+                CheckBoxPreference box2 = fragment.findPreference(cPREF_STAT_DETAIL_CLEAR);
+                assert box2 != null;
                 box2.setChecked(true);
                 deleteFiles(type, keep);
         }
@@ -262,7 +258,7 @@ class SaveData {
     }
 
     // If AlertDialog was ended with "Yes", we set the number for Autoclean as choosen and delete old files
-    void saveNumberAndDelete(String type, int number, PreferenceFragment fragment){
+    void saveNumberAndDelete(String type, int number, PreferenceFragmentCompat fragment){
         switch (type) {
             // For daily statistics
             case cSTAT_TYPE_DAILY:
@@ -271,14 +267,16 @@ class SaveData {
             // for regular statistics
             case cSTAT_TYPE_REGULAR:
                 // We got the fragment, so we can change the preference directly
-                EditTextPreference text1 = (EditTextPreference) fragment.findPreference(cPREF_STAT_HOUR_CLEAR_NUM);
+                EditTextPreference text1 = fragment.findPreference(cPREF_STAT_HOUR_CLEAR_NUM);
+                assert text1 != null;
                 text1.setText(Integer.toString(number));
                 deleteFiles(type,number);
                 break;
             // for detailed statistics
             default:
                 // We got the fragment, so we can change the preference directly
-                EditTextPreference text2 = (EditTextPreference) fragment.findPreference(cPREF_STAT_DETAIL_CLEAR_NUM);
+                EditTextPreference text2 = fragment.findPreference(cPREF_STAT_DETAIL_CLEAR_NUM);
+                assert text2 != null;
                 text2.setText(Integer.toString(number));
                 deleteFiles(type, number);
         }
@@ -301,6 +299,7 @@ class SaveData {
                 return s.contains(filenameend);
             }
         });
+        assert filelist != null;
         int deletefiles = filelist.length - keep;
         if (deletefiles > 0) {
             Arrays.sort(filelist);
@@ -312,7 +311,7 @@ class SaveData {
 
     // central point for directory
     private File getDirectory(){
-        String temp =  Environment.getExternalStorageDirectory() + File.separator + cDIRECTORY;
+        String temp =  Objects.requireNonNull(mContext.getExternalFilesDir(cDIRECTORY)).toString();// + File.separator + cDIRECTORY;
         return new File(temp);
     }
 
