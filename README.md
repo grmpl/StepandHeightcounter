@@ -1,7 +1,8 @@
 # StepandHeightcounter
-This Android app counts steps and elevation gain on a Nexus 5x. It should work on all devices with a step counter sensor and a pressure sensor, but I haven't tested it.
-A pressure or barometric sensor is mandatory, steps will not be counted without pressure values. The step counter sensor is a special sensor which counts the steps by itself without additional software and is not to be mistaken with a step detector sensor.
-So, if you are using another device, don't put the blame on me if it is not working.
+This Android app counts steps and elevation gain. It should work on all devices with a step counter sensor and a pressure sensor.
+Since Android 10+ access permission to "Physical Activity" is necessary for step sensor. Thanks to duggalsu the app has been reworked and current release is now working again. I haven't tested, if reworked app is working on older devices. Please use release v1.21-fdroid if not.
+
+A pressure or barometric sensor is mandatory, steps will not be counted without pressure values. Please note: The step counter sensor is a special sensor which counts the steps by itself without additional software and is not to be mistaken with a step detector sensor.
 
 I've written the app, because I was interested in my elevation gain when I walk up the stairs instead of using the elevator. I couldn't find any app with this feature yet. (I haven't tried one of the big activity apps, because they are doing much more than I want.)
 
@@ -20,5 +21,6 @@ Needed permissions:
 
 1. Keep devices awake: App is running in background, but will not keep the device awake for the whole time! I inserted regular alarms, wakeup-triggers and limited wakelocks to be sure that data is processed when necessary and device can sleep the other time.
 2. Write to external storage: All data will be saved to "internal" SD-card. App will run without permission, but saving data will not be possible.
+3. Access to physical activity: Access to step sensor needs permission to access physical activity since Android 10+. The app will not work without this permission.
 
-It's my first android application, so the code may be a little bit clumsy at some points. ;-)
+It's my first and only android application, so the code may be a little bit clumsy at some points. ;-)
