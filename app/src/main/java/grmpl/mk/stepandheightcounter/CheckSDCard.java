@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Environment;
 import androidx.preference.PreferenceManager;
 import androidx.core.app.ActivityCompat;
@@ -22,8 +23,9 @@ class CheckSDCard {
         boolean mExternalStorageWriteable = false;
         String state = Environment.getExternalStorageState();
 
-        if (ActivityCompat.checkSelfPermission(mContext,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )
+        if ( (ActivityCompat.checkSelfPermission(mContext,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+              || (Build.VERSION.SDK_INT >=  Build.VERSION_CODES.Q) )
             // if mounted rw this is true, else this will be false
             mExternalStorageWriteable = Environment.MEDIA_MOUNTED.equals(state);
         else {
