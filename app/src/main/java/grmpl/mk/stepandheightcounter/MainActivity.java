@@ -258,7 +258,8 @@ public class MainActivity extends AppCompatActivity {
                     if (mSensService != null) height = mSensService.getHeight();
                     else height = -9996;
                     mSave.saveStatistics(System.currentTimeMillis(), mSettings.getFloat("mStepsCumul0", 0),
-                            mSettings.getFloat("mHeightCumul0", 0), height, cSTAT_TYPE_MARK);
+                            mSettings.getFloat("mHeightCumul0", 0), mSettings.getFloat("mDecrCumul0", 0),
+                            mSettings.getFloat("mTimeCumul0", 0), height, cSTAT_TYPE_MARK);
                 }
             });
         }

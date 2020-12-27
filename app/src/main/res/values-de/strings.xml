@@ -73,8 +73,8 @@
     <string name="pref_stat_detail_multi_dialog_title">Welche Daten sollen gespeichert werden?</string>
     <string name="pref_stat_detail_calibration">Höheneinstellung</string>
     <string name="pref_stat_detail_reset">Zurücksetzen der Werte</string>
-    <string name="save_stat_headline_height">Zeit, Zeitzone, Schritte, Höhenmeter, Höhe, Eintragstyp</string>
-    <string name="save_stat_headline">Zeit, Zeitzone, Schritte, Höhenmeter, Eintragstyp</string>
+    <string name="save_stat_headline_height">Zeit, Zeitzone, Schritte, Höhenmeter, Abstieg, Messzeit, Höhe, Eintragstyp</string>
+    <string name="save_stat_headline">Zeit, Zeitzone, Schritte, Höhenmeter, Abstieg, Messzeit, Eintragstyp</string>
     <string name="stat_type_calibration_after">Nach Höheneinstellung</string>
     <string name="stat_type_calibration_before">Vor Höheneinstellung</string>
     <string name="stat_type_reset_after">Nach Zurücksetzen</string>

@@ -80,8 +80,8 @@
     <string name="pref_stat_detail_start">Start measurement</string>
     <string name="pref_stat_detail_steps">Every step sensor event</string>
     <string name="pref_stat_detail_stop">Stop measurement</string>
-    <string name="save_stat_headline_height">Time, timezone, steps, elevation gain, height, entry type\n</string>
-    <string name="save_stat_headline">"Time, timezone, steps, elevation gain, entry type "</string>
+    <string name="save_stat_headline_height">Time, timezone, steps, elevation gain, elevation decrease, time running, height, entry type\n</string>
+    <string name="save_stat_headline">"Time, timezone, steps, elevation gain, elevation decrease, time running, entry type "</string>
     <string name="stat_type_reset_before">Before reset</string>
     <string name="stat_type_calibration_before">Before calibration</string>
     <string name="stat_type_calibration_after">After calibration</string>

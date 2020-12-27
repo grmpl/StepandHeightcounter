@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import static grmpl.mk.stepandheightcounter.Constants.*;
+import static java.lang.Math.abs;
 import static java.lang.Math.pow;
 
 
@@ -57,9 +58,14 @@ public class SensorService extends Service {
     // counting height
     private float[]       mHeightCumul = {0,-1,-1}; // 0: detail, 1: regulary, 2: daily
     private float         mHeightBefore = 0;
+    // counting decrease
+    private float[]       mDecrCumul = {0,-1,-1}; // 0: detail, 1: regulary, 2: daily
     // Reference height
     private long          mHeightRefTimestamp = 0;  //nanoseconds
     private float         mHeightRef = cINIT_HEIGHT_REFCAL;
+
+    // counting time
+    private float[]          mTimeCumul = {0,-1,-1};
 
     // timestamp of sensor events (nanoseconds!)
     private long mEvtTimestampMilliSec = 0; // we only need one timestamp for all *Cumul-values
@@ -131,9 +137,9 @@ public class SensorService extends Service {
             outline = sdformati.format(System.currentTimeMillis()) + ";";
             // Step event timestamp translated to real time
             outline = outline + sdformati.format(steptimestamp/ cNANO_IN_MILLISECONDS + mTimestampDeltaMilliSec) + ";";
-            outline = outline + String.format(Locale.US,"%.3f; %.0f; %.0f; %.3f; %.3f; %.2f; %.3f; %.2f; %.2f \n",
+            outline = outline + String.format(Locale.US,"%.3f; %.0f; %.0f; %.3f; %.3f; %.2f; %.3f; %.2f; %.2f; %.2f; %.2f \n",
                     (float)steptimestamp/ cNANO_IN_SECONDS,mStepsCumul[0],stepstotal,(float)pressuretimestamp/ cNANO_IN_SECONDS,pressure,height,
-                    (float)mHeightRefTimestamp/ cNANO_IN_SECONDS,mHeightRef,mHeightCumul[0]);
+                    (float)mHeightRefTimestamp/ cNANO_IN_SECONDS,mHeightRef,mHeightCumul[0],mDecrCumul[0],mTimeCumul[0]);
             return outline;
         }
     }
@@ -235,14 +241,18 @@ public class SensorService extends Service {
             // if there was no measurement in this periodic intervall, cumul-values will be set to -1
             if (mHeightCumul[1] < 0) mHeightCumul[1] = 0;
             if (mHeightCumul[2] < 0) mHeightCumul[2] = 0;
+            if (mDecrCumul[1] < 0) mDecrCumul[1] = 0;
+            if (mDecrCumul[2] < 0) mDecrCumul[2] = 0;
             if (mStepsCumul[1] < 0) mStepsCumul[1] = 0;
             if (mStepsCumul[2] < 0) mStepsCumul[2] = 0;
+            if (mTimeCumul[1] < 0) mTimeCumul[1] = 0;
+            if (mTimeCumul[2] < 0) mTimeCumul[2] = 0;
             // change should be saved
             savePersistent();
 
 
             if (getDetailSave("a"))
-            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), cSTAT_TYPE_START);
+            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], mDecrCumul[0], mTimeCumul[0], getHeight(), cSTAT_TYPE_START);
 
             mAlarm.setAlarm(this);
 
@@ -273,7 +283,7 @@ public class SensorService extends Service {
         correlateSensorEvents();
 
         if (getDetailSave("o"))
-            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), cSTAT_TYPE_STOP);
+            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], mDecrCumul[0], mTimeCumul[0], getHeight(), cSTAT_TYPE_STOP);
 
 
         //reset array
@@ -402,6 +412,11 @@ public class SensorService extends Service {
                     mStepsCumul[i] =
                             mStepsCumul[i] + values.stepstotal - mStepValuesCorrBefore.stepstotal;
                 }
+                // then the time elapsed (in seconds)
+                for (int i = 0; i < mTimeCumul.length; i++) {
+                    mTimeCumul[i] =
+                            mTimeCumul[i] + (values.steptimestamp - mStepValuesCorrBefore.steptimestamp)/ cNANO_IN_SECONDS;
+                }
                 // and timestamp for event (we will only need msec in Unix time)
                 mEvtTimestampMilliSec = values.steptimestamp / cNANO_IN_MILLISECONDS + mTimestampDeltaMilliSec;
 
@@ -413,19 +428,19 @@ public class SensorService extends Service {
 
                 if ( ( (values.steptimestamp - mStepValuesCorrBefore.steptimestamp)
                            / (values.stepstotal - mStepValuesCorrBefore.stepstotal)
-                           > cMAX_STEP_DURATION * cNANO_IN_SECONDS
+                           > cMAX_STEP_DURATION * cNANO_IN_SECONDS // steps took too long
                      ) ||
-                     ( (height - mHeightBefore)
+                     ( abs(height - mHeightBefore)
                            / (values.steptimestamp - mStepValuesCorrBefore.steptimestamp)
-                           > cMAX_ELEV_GAIN
+                           > cMAX_ELEV_GAIN // ascending/descending was too fast
                      ) ||
                      ( mHeightRef <= cINIT_HEIGHT_REFCAL)
                    ) {
                        mHeightRef = height;
                        mHeightRefTimestamp = values.steptimestamp;
                 } else {
-                    // Here is the only place where we count the ascending
-                    // only count if ascending is greater than 1m
+                    // Here is the only place where we count the ascending/descending
+                    // only count if ascending/descending is greater than 1m
                     // lower values could be everything (e.g. atmospheric pressure change)
                     if ((height - mHeightRef) >= 1) {
                         for (int i = 0; i < mHeightCumul.length; i++) {
@@ -433,19 +448,22 @@ public class SensorService extends Service {
                         }
                         mHeightRef = height;
                         mHeightRefTimestamp = values.steptimestamp;
+                    } else if ((height - mHeightRef) <= -1) {
+                        for (int i = 0; i < mDecrCumul.length; i++) {
+                            mDecrCumul[i] = mDecrCumul[i] + height - mHeightRef;
+                        }
+                        mHeightRef = height;
+                        mHeightRefTimestamp = values.steptimestamp;
                     } else {
-                        // if we are descending or slow ascending: just save new height as reference, don't count it
+                        // if we are slow ascending/descending: just save new height as reference, don't count it
                         //   slow ascending/descending: after mMAX_DURATION_1M seconds height difference is less than +-1m
-                        //   descending: height difference is less than 1m negative
-                        //         (please note: slow descending should also lead to new reference height only, if 1 minute has passed
-                        //                       so -1 for second comparison is correct, not 0
                         //  note: timestamp is nanoseconds
-                        if (((values.steptimestamp - mHeightRefTimestamp) > cMAX_DURATION_1M * cNANO_IN_SECONDS)
-                                || ((height - mHeightRef) <= -1)) {
+                        if ((values.steptimestamp - mHeightRefTimestamp) > cMAX_DURATION_1M * cNANO_IN_SECONDS) {
                             mHeightRef = height;
                             mHeightRefTimestamp = values.steptimestamp;
                         }
                     }
+
 
                 }
 
@@ -463,7 +481,7 @@ public class SensorService extends Service {
 
             if (getDetailSave("e"))
                 mSave.saveStatistics(mEvtTimestampMilliSec,
-                        mStepsCumul[0], mHeightCumul[0], height, cSTAT_TYPE_SENS);
+                        mStepsCumul[0], mHeightCumul[0], mDecrCumul[0], mTimeCumul[0], height, cSTAT_TYPE_SENS);
 
             // https://stackoverflow.com/questions/47531742/startforeground-fail-after-upgrade-to-android-8-1
             // https://stackoverflow.com/questions/53815261/bad-notification-for-startforeground
@@ -500,11 +518,12 @@ public class SensorService extends Service {
             callback.putExtra("Steps", mStepsCumul[0]);
             callback.putExtra("Height", height);
             callback.putExtra("Heightacc", mHeightCumul[0]);
+            callback.putExtra("Decracc", mDecrCumul[0]);
+            callback.putExtra("Timeacc", mTimeCumul[0]);
             callback.putExtra("Registered", true);
             callback.putExtra("Stepstoday", mStepsCumul[2]);
             callback.putExtra("Heighttoday", mHeightCumul[2]);
             sendBroadcast(callback);
-
         }
 
         mSave.saveDebugStatus("correlation loop finished, " + calcindex +
@@ -684,7 +703,7 @@ public class SensorService extends Service {
         // if pressure is already measured, calculate sea level pressure from actual pressure
         if (mPressure > 0) {
             if (getDetailSave("c"))
-                mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), getString(R.string.stat_type_calibration_before));
+                mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], mDecrCumul[0], mTimeCumul[0], getHeight(), getString(R.string.stat_type_calibration_before));
 
             // get pressure of height reference (saving it would be more difficult than reextracting
             //   as calibration would be done seldom)
@@ -699,7 +718,7 @@ public class SensorService extends Service {
             // calibration done, temporary value must be cleared
             mCalibrationHeight = cINIT_HEIGHT_REFCAL;
             if (getDetailSave("c"))
-                mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), getString(R.string.stat_type_calibration_after));
+                mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], mDecrCumul[0], mTimeCumul[0], getHeight(), getString(R.string.stat_type_calibration_after));
 
         }
         // if there is no pressure yet, save value for later calibration
@@ -708,14 +727,16 @@ public class SensorService extends Service {
 
     void resetData() {
         if (getDetailSave("r"))
-            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), getString(R.string.stat_type_reset_before) );
+            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], mDecrCumul[0], mTimeCumul[0], getHeight(), getString(R.string.stat_type_reset_before) );
         mStepsCumul[0] = 0;
         mPressureZ = cPRESSURE_SEA;
         mHeightRef = cINIT_HEIGHT_REFCAL; // 0 as init-value would not work at sea
         mHeightCumul[0] = 0;
+        mDecrCumul[0]=0;
+        mTimeCumul[0]=0;
         savePersistent();
         if (getDetailSave("r"))
-            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], getHeight(), getString(R.string.stat_type_reset_after) );
+            mSave.saveStatistics(System.currentTimeMillis(), mStepsCumul[0], mHeightCumul[0], mDecrCumul[0], mTimeCumul[0], getHeight(), getString(R.string.stat_type_reset_after) );
     }
 
     void getValues() {
@@ -735,6 +756,8 @@ public class SensorService extends Service {
         callback.putExtra("Steps",mStepsCumul[0]);
         callback.putExtra("Height",getHeight());
         callback.putExtra("Heightacc",mHeightCumul[0]);
+        callback.putExtra("Decracc", mDecrCumul[0]);
+        callback.putExtra("Timeacc", mTimeCumul[0]);
         callback.putExtra("Registered",mRegistered);
         callback.putExtra("Stepstoday", mStepsCumul[2]);
         callback.putExtra("Heighttoday", mHeightCumul[2]);
@@ -773,6 +796,8 @@ public class SensorService extends Service {
         for ( int i = 0; i < mStepsCumul.length; i++){
             editpref.putFloat("mStepsCumul" + i, mStepsCumul[i]);
             editpref.putFloat("mHeightCumul" + i, mHeightCumul[i]);
+            editpref.putFloat("mDecrCumul" + i, mDecrCumul[i]);
+            editpref.putFloat("mTimeCumul" + i, mTimeCumul[i]);
         }
         editpref.putLong("mEvtTimestampMilliSec", mEvtTimestampMilliSec);
         editpref.putFloat("mPressureZ", mPressureZ);
@@ -786,6 +811,8 @@ public class SensorService extends Service {
         for ( int i = 0; i < mStepsCumul.length; i++){
             mStepsCumul[i]   = mSettings.getFloat("mStepsCumul" + i, 0);
             mHeightCumul[i]  = mSettings.getFloat("mHeightCumul" + i, 0);
+            mDecrCumul[i]  = mSettings.getFloat("mDecrCumul" + i, 0);
+            mTimeCumul[i]  = mSettings.getFloat("mTimeCumul" + i, 0);
         }
         mEvtTimestampMilliSec = mSettings.getLong("mEvtTimestampMilliSec", 0);
         mPressureZ = mSettings.getFloat("mPressureZ", cPRESSURE_SEA);
@@ -833,9 +860,11 @@ public class SensorService extends Service {
                     //  drawback: last interval of day is saved at next day 0:00
                     //    solution: check in save-method for 0:00 and save it as 24:00
                     mSave.saveStatistics( (evtint + 1) * interval_msec,
-                            mStepsCumul[1],mHeightCumul[1],cSTAT_TYPE_REGULAR);
+                            mStepsCumul[1],mHeightCumul[1], mDecrCumul[0], mTimeCumul[0],cSTAT_TYPE_REGULAR);
                     mStepsCumul[1] = running;  // method can be called even if measurement is not running
                     mHeightCumul[1] = running; // so we have to save actual state
+                    mDecrCumul[1] = running;
+                    mTimeCumul[1] = running;
                     // set evttimestamp, otherwise this function will be called repeatedly until next event (steps!) is saved
                     //  please note: regular intervals have to be a integral divisor of day, otherwise we would need two different
                     //              event timestamps
@@ -846,7 +875,7 @@ public class SensorService extends Service {
                     if (currint - evtint > 100) evtint = ( 24*60*60*1000 * ( acttimestamp_msec/(24 * 60 * 60 * 1000) )
                             - tz.getOffset(acttimestamp_msec) ) / interval_msec - 1 ;
                     for (long l = evtint + 2; l <= currint; l++)
-                        mSave.saveStatistics( l * interval_msec, running, running,cSTAT_TYPE_REGULAR);
+                        mSave.saveStatistics( l * interval_msec, running, running, running, running,cSTAT_TYPE_REGULAR);
                 }
                 //else nothing to do
             }
@@ -862,14 +891,16 @@ public class SensorService extends Service {
                     // as our days are UTC-days ( integer * 24h ), we have to correct the timestamps with timezone-information
                     //   timestamp for saving would be 0:00
                     mSave.saveStatistics( evtint * interval_msec - tz.getOffset(mEvtTimestampMilliSec),
-                            mStepsCumul[2],mHeightCumul[2],cSTAT_TYPE_DAILY);
+                            mStepsCumul[2],mHeightCumul[2], mDecrCumul[0], mTimeCumul[0],cSTAT_TYPE_DAILY);
                     mStepsCumul[2] = running;  //see above
                     mHeightCumul[2] = running; //see above
+                    mDecrCumul[2] = running; //see above
+                    mTimeCumul[2] = running; //see above
                     setevttimestamp = true;
                     // fill up all intervals without values, but not more than one week
                     if (currint - evtint > 8) evtint = currint - 8;
                     for (long l = evtint + 1; l < currint; l++)
-                        mSave.saveStatistics( l * interval_msec - tz.getOffset(mEvtTimestampMilliSec), running, running, cSTAT_TYPE_DAILY);
+                        mSave.saveStatistics( l * interval_msec - tz.getOffset(mEvtTimestampMilliSec), running, running, running, running, cSTAT_TYPE_DAILY);
                 }
                 //else nothing to do
             }

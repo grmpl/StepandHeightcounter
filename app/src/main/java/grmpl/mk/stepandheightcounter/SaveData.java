@@ -124,15 +124,15 @@ class SaveData {
 
 
     // Saving statistics - one method with height information, one without
-    void saveStatistics(long timems, float stepscumul, float heightcumul, float height, String type) {
-        saveStatistics(timems, stepscumul, heightcumul, height, type, true);
+    void saveStatistics(long timems, float stepscumul, float heightcumul, float decrcumul, float timecumul, float height, String type) {
+        saveStatistics(timems, stepscumul, heightcumul, decrcumul, timecumul, height, type, true);
     }
 
-    void saveStatistics(long timems, float stepscumul, float heightcumul, String type) {
-        saveStatistics(timems, stepscumul, heightcumul, -9997, type, false);
+    void saveStatistics(long timems, float stepscumul, float heightcumul, float timecumul, float decrcumul, String type) {
+        saveStatistics(timems, stepscumul, heightcumul, decrcumul, timecumul, -99997, type, false);
     }
 
-    private void saveStatistics(long timems, float stepscumul, float heightcumul, float height, String type, boolean heightout) {
+    private void saveStatistics(long timems, float stepscumul, float heightcumul, float decrcumul, float timecumul, float height, String type, boolean heightout) {
         if(mCheckSDCard.checkWriteSDCard()) {
             SimpleDateFormat sdformat, sdformati;
             final String filenamet;
@@ -186,11 +186,11 @@ class SaveData {
                 outline = (sdformati.format(timems) + ",").replace("23:59","24:00");
             if (heightout)
                 outline = outline
-                        + String.format(Locale.US, "%.0f, %.0f, %.0f, ", stepscumul, heightcumul, height)
+                        + String.format(Locale.US, "%.0f, %.0f, %.0f, %.0f, %.0f, ", stepscumul, heightcumul, decrcumul, timecumul, height)
                         + type + "\n";
             else
                 outline = outline
-                        + String.format(Locale.US, "%.0f, %.0f, ", stepscumul, heightcumul)
+                        + String.format(Locale.US, "%.0f, %.0f, %.0f, ", stepscumul, heightcumul, decrcumul, timecumul)
                         + type + "\n";
 
             try {
