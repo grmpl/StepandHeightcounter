@@ -89,7 +89,7 @@
                 android:layout_alignParentEnd="true" />
 
             <TextView
-                android:text="@string/height_accumulated"
+                android:text="@string/heightdesc_accumulated"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/textViewHeightacc"
@@ -99,7 +99,19 @@
                 android:layout_alignStart="@+id/textViewSteps" />
 
             <TextView
-                android:text="@string/zero_m"
+                android:text="@string/time_accumulated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewTime"
+                android:textAppearance="@android:style/TextAppearance.Material.Large"
+                android:layout_marginTop="@dimen/default_gap"
+                android:layout_marginBottom="@dimen/default_gap"
+                android:layout_below="@+id/textViewHeightacc"
+                android:layout_alignStart="@+id/textViewSteps" />
+
+
+            <TextView
+                android:text="@string/zerozero_m"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/textViewHeightaccO"
@@ -107,6 +119,17 @@
                 android:layout_alignBaseline="@id/textViewHeightacc"
                 android:layout_alignBottom="@+id/textViewHeightacc"
                 android:layout_alignParentEnd="true" />
+
+            <TextView
+                android:text="@string/zero_s"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewTimeaccO"
+                android:textAppearance="@android:style/TextAppearance.Material.Large"
+                android:layout_alignBaseline="@+id/textViewTime"
+                android:layout_alignBottom="@+id/textViewTime"
+                android:layout_alignEnd="@+id/textViewStepO"
+                android:layout_marginTop="17dp" />
 
             <EditText
                 android:layout_width="100dp"
@@ -122,7 +145,7 @@
                 android:hint="@string/height_m"
                 android:maxLines="1"
                 android:layout_alignStart="@+id/textViewSteps"
-                android:layout_below="@id/textViewHeightacc"
+                android:layout_below="@id/textViewTime"
                 android:layout_marginTop="15dp"/>
 
             <Button
