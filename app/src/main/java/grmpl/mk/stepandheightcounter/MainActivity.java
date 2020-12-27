@@ -46,7 +46,7 @@ import static grmpl.mk.stepandheightcounter.Constants.*;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView mStatusText, mHeightText, mStepText, mHeightaccText, mTimeaccText, mStepDailyText, mHeightDailyText;
+    private TextView mStatusText, mHeightText, mStepText, mHeightaccText, mDecraccText, mTimeaccText, mStepDailyText, mHeightDailyText;
     private EditText mCalibrateIn;
     private Button mStartButton;
     private FloatingActionButton mFloatingButton;
@@ -156,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
         mStatusText = (TextView)findViewById(R.id.textViewError);
         mHeightText = (TextView)findViewById(R.id.textViewHeightO);
         mHeightaccText = (TextView)findViewById(R.id.textViewHeightaccO);
+        mDecraccText = (TextView)findViewById(R.id.textViewDecraccO);
         mTimeaccText = (TextView)findViewById(R.id.textViewTimeaccO);
         mStepText = (TextView)findViewById(R.id.textViewStepO);
         mCalibrateIn = (EditText)findViewById(R.id.editTextHeightcal);
@@ -322,7 +323,8 @@ public class MainActivity extends AppCompatActivity {
         if (mSensService != null) mSensService.resetData();
         mStepText.setText(R.string.zero);
         mHeightText.setText(R.string.height_init1);
-        mHeightaccText.setText(R.string.zerozero_m);
+        mHeightaccText.setText(R.string.zero_m);
+        mDecraccText.setText(R.string.zero_m);
         mTimeaccText.setText(R.string.zero_s);
         mStatusText.setText("");
         mCalibrateIn.setText("");
@@ -390,8 +392,9 @@ public class MainActivity extends AppCompatActivity {
             Float height = receive.getFloatExtra("Height",997F);
             mHeightText.setText(String.format(Locale.getDefault(),"%.1f m",height));
             Float heightacc = receive.getFloatExtra("Heightacc",0F);
+            mHeightaccText.setText(String.format(Locale.getDefault(),"%.1f m",heightacc));
             Float decracc = receive.getFloatExtra("Decracc",0F);
-            mHeightaccText.setText(String.format(Locale.getDefault(),"%.1f / %.1f m",heightacc,decracc));
+            mDecraccText.setText(String.format(Locale.getDefault(),"%.1f m",decracc));
             Float timeacc = receive.getFloatExtra("Timeacc",0F);
             mTimeaccText.setText(String.format(Locale.getDefault(),"%.1f s",timeacc));
             float stepstoday = receive.getFloatExtra("Stepstoday",0F);

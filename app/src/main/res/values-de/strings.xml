@@ -23,9 +23,9 @@
     <string name="height_actual">Aktuelle Höhe</string>
     <string name="no_data">Keine Werte</string>
     <string name="height_m">Höhe [m]</string>
-    <string name="height_accumulated">Höhenmeter</string>
-    <string name="desc_accumulated">Abstieg</string>
-    <string name="heightdesc_accumulated">Höhenmeter auf/ab</string>
+    <string name="height_accumulated">Aufstieg</string>
+    <string name="decr_accumulated">Abstieg</string>
+    <string name="heightdesc_accumulated">Höhenm. auf/ab</string>
     <string name="time_accumulated">Abgelaufene Zeit</string>
     <string name="steps">Schritte</string>
     <string name="stop_service_notice">Hinweis wird wieder ausgeblendet, App muss neu gestartet werden, alle Daten gehen verloren!</string>

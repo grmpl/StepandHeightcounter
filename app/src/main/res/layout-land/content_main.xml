@@ -89,7 +89,7 @@
                 android:layout_alignParentEnd="true" />
 
             <TextView
-                android:text="@string/heightdesc_accumulated"
+                android:text="@string/height_accumulated"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/textViewHeightacc"
@@ -99,6 +99,17 @@
                 android:layout_alignStart="@+id/textViewSteps" />
 
             <TextView
+                android:text="@string/decr_accumulated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewDecracc"
+                android:textAppearance="@android:style/TextAppearance.Material.Large"
+                android:layout_marginTop="@dimen/default_gap"
+                android:layout_below="@+id/textViewHeightacc"
+                android:layout_alignStart="@+id/textViewSteps" />
+
+
+            <TextView
                 android:text="@string/time_accumulated"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -106,18 +117,27 @@
                 android:textAppearance="@android:style/TextAppearance.Material.Large"
                 android:layout_marginTop="@dimen/default_gap"
                 android:layout_marginBottom="@dimen/default_gap"
-                android:layout_below="@+id/textViewHeightacc"
+                android:layout_below="@+id/textViewDecracc"
                 android:layout_alignStart="@+id/textViewSteps" />
 
-
             <TextView
-                android:text="@string/zerozero_m"
+                android:text="@string/zero_m"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/textViewHeightaccO"
                 android:textAppearance="@android:style/TextAppearance.Material.Large"
                 android:layout_alignBaseline="@id/textViewHeightacc"
                 android:layout_alignBottom="@+id/textViewHeightacc"
+                android:layout_alignParentEnd="true" />
+
+            <TextView
+                android:text="@string/zero_m"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textViewDecraccO"
+                android:textAppearance="@android:style/TextAppearance.Material.Large"
+                android:layout_alignBaseline="@id/textViewDecracc"
+                android:layout_alignBottom="@+id/textViewDecracc"
                 android:layout_alignParentEnd="true" />
 
             <TextView
