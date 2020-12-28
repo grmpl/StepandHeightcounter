@@ -38,6 +38,7 @@ import android.widget.Toast;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import grmpl.mk.stepandheightcounter.SensorService.LocalBinder;
 
@@ -395,8 +396,13 @@ public class MainActivity extends AppCompatActivity {
             mHeightaccText.setText(String.format(Locale.getDefault(),"%.1f m",heightacc));
             Float decracc = receive.getFloatExtra("Decracc",0F);
             mDecraccText.setText(String.format(Locale.getDefault(),"%.1f m",decracc));
-            Float timeacc = receive.getFloatExtra("Timeacc",0F);
-            mTimeaccText.setText(String.format(Locale.getDefault(),"%.1f s",timeacc));
+            Long timeacc = (long)receive.getFloatExtra("Timeacc",0F);
+            // mTimeaccText.setText(String.format(Locale.getDefault(),"%.1f s",timeacc));
+            mTimeaccText.setText(String.format(Locale.getDefault(),"%02d:%02d:%02d",
+                    TimeUnit.SECONDS.toHours(timeacc),
+                    TimeUnit.SECONDS.toMinutes(timeacc),
+                    TimeUnit.SECONDS.toSeconds(timeacc)
+            ));
             float stepstoday = receive.getFloatExtra("Stepstoday",0F);
             mStepDailyText.setText(String.format(Locale.getDefault(),"%.0f",stepstoday));
             // set progress bars

@@ -34,7 +34,7 @@
     <string name="time_accumulated">Time running</string>
     <string name="zero_m" translatable="false">0 m</string>
     <string name="zerozero_m" translatable="false">0 / 0 m</string>
-    <string name="zero_s" translatable="false">0 s</string>
+    <string name="zero_s" translatable="false">00:00:00</string>
     <string name="no_data">No data</string>
     <string name="stop_service_notice">Disable notification.\nApp has to be restarted. \nAll unsaved data will be lost!</string>
     <string name="button_stop_service">Stop Service</string>
