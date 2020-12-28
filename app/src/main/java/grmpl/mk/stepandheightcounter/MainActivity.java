@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
                     }
 
-                    if(writeExternalFile) {
+                    if(writeExternalFile) { // Permission on Android10+ not necessary, because of scoped storage
                         Toast.makeText(MainActivity.this, R.string.permission_sdcard_granted,
                                 Toast.LENGTH_SHORT).show();
                         SharedPreferences.Editor editpref =
