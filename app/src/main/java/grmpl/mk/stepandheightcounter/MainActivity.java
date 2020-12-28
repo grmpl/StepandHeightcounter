@@ -62,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
     // https://stackoverflow.com/questions/42941662/request-permissions-in-main-activity
     public static final int MULTIPLE_PERMISSIONS = 100;
 
+    // Todo: Permission check is a mess copied out of the internet and modified to the needs
+    //       Should be reworked to something nicer like this one: https://stackoverflow.com/questions/34342816/android-6-0-multiple-permissions
+
     private void checkPermission() {
         if (ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.ACTIVITY_RECOGNITION)
@@ -97,11 +100,24 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(
             int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        boolean activityPermission=false;
+        boolean writeExternalFile=false;
+
         switch (requestCode) {
             case MULTIPLE_PERMISSIONS:
                 if (grantResults.length > 0) {
-                    boolean activityPermission = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                    boolean writeExternalFile = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    for (int i = 0; i < grantResults.length; i++) {
+                        String test=permissions[i];
+                        switch (permissions[i]){
+                            case Manifest.permission.ACTIVITY_RECOGNITION:
+                                activityPermission = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+                                break;
+                            case Manifest.permission.WRITE_EXTERNAL_STORAGE:
+                                writeExternalFile = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+                                break;
+                        }
+
+                    }
 
                     if(writeExternalFile) {
                         Toast.makeText(MainActivity.this, R.string.permission_sdcard_granted,
@@ -110,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                                 PreferenceManager.getDefaultSharedPreferences(this).edit();
                         editpref.putBoolean("mReqSDPermission", false);
                         editpref.apply();
-                    } else {
+                    } else if (Build.VERSION.SDK_INT <  Build.VERSION_CODES.Q) {
                         Toast.makeText(MainActivity.this, R.string.cant_write_sdcard,
                                 Toast.LENGTH_SHORT).show();
                     }

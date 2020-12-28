@@ -28,8 +28,8 @@
     <string name="height_m">height [m]</string>
     <string name="height_init1">999 m</string>
     <string name="zero" translatable="false">0</string>
-    <string name="height_accumulated">Elevation gain</string>
-    <string name="decr_accumulated">Elevation loss</string>
+    <string name="height_accumulated">Ascending</string>
+    <string name="decr_accumulated">Descending</string>
     <string name="heightdesc_accumulated">Elev. gain/loss</string>
     <string name="time_accumulated">Time running</string>
     <string name="zero_m" translatable="false">0 m</string>
