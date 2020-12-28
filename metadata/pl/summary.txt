@@ -1,1 +1,0 @@
-Licznik kroków i przyrostu wysokości
