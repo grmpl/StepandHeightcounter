@@ -6,7 +6,7 @@ Elevation gain should only be counted if steps are detected, so only stairs will
 
 You can save regular and daily statistics automatically on SD-Card and save current values with the floating action button. Starting with Android 10 files are not saved to root-folder of SD-card anymore, but in app-directory. There isn’t much on graphical display of statistic data besides two progress bars. Just use any program which can read csv-values. 
 
-'''Permissions:'''
+<b>Permissions:</b>
 * Access to physical activity: Access to step sensor needs permission to access physical activity since Android 10+. The app will not work without this permission on devices with Android 10 and higher.
 * Keep device awake: Device will not be kept awake all time. It will be woken up regulary and kept awake if necessary for short time to ensure proper counting of steps and elevation gain.
 * Write to external storage: App will work without this permission, but you cannot save statistical values or markers.
