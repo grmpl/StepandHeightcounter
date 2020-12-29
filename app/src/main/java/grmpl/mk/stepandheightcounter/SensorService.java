@@ -415,7 +415,7 @@ public class SensorService extends Service {
                 // then the time elapsed (in seconds)
                 for (int i = 0; i < mTimeCumul.length; i++) {
                     mTimeCumul[i] =
-                            mTimeCumul[i] + (values.steptimestamp - mStepValuesCorrBefore.steptimestamp)/ cNANO_IN_SECONDS;
+                            mTimeCumul[i] + (float)(values.steptimestamp - mStepValuesCorrBefore.steptimestamp)/ cNANO_IN_SECONDS;
                 }
                 // and timestamp for event (we will only need msec in Unix time)
                 mEvtTimestampMilliSec = values.steptimestamp / cNANO_IN_MILLISECONDS + mTimestampDeltaMilliSec;

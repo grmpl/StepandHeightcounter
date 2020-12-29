@@ -190,7 +190,7 @@ class SaveData {
                         + type + "\n";
             else
                 outline = outline
-                        + String.format(Locale.US, "%.0f, %.0f, %.0f, ", stepscumul, heightcumul, decrcumul, timecumul)
+                        + String.format(Locale.US, "%.0f, %.0f, %.0f, %.0f, ", stepscumul, heightcumul, decrcumul, timecumul)
                         + type + "\n";
 
             try {

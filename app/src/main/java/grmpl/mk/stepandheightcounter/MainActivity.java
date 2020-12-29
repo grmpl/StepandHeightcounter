@@ -107,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
             case MULTIPLE_PERMISSIONS:
                 if (grantResults.length > 0) {
                     for (int i = 0; i < grantResults.length; i++) {
-                        String test=permissions[i];
                         switch (permissions[i]){
                             case Manifest.permission.ACTIVITY_RECOGNITION:
                                 activityPermission = grantResults[i] == PackageManager.PERMISSION_GRANTED;
@@ -160,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Request permissions
@@ -170,21 +169,21 @@ public class MainActivity extends AppCompatActivity {
         mSettings = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Get all necessary elements
-        mStatusText = (TextView)findViewById(R.id.textViewError);
-        mHeightText = (TextView)findViewById(R.id.textViewHeightO);
-        mHeightaccText = (TextView)findViewById(R.id.textViewHeightaccO);
-        mDecraccText = (TextView)findViewById(R.id.textViewDecraccO);
-        mTimeaccText = (TextView)findViewById(R.id.textViewTimeaccO);
-        mStepText = (TextView)findViewById(R.id.textViewStepO);
-        mCalibrateIn = (EditText)findViewById(R.id.editTextHeightcal);
-        mStartButton = (Button)findViewById(R.id.buttonStart);
-        mStepDailyText = (TextView)findViewById(R.id.textViewDailyStepsNum);
-        mHeightDailyText = (TextView)findViewById(R.id.textViewDailyHeightNum);
-        mStepDailyProgress = (ProgressBar)findViewById(R.id.progressBarSteps);
+        mStatusText = findViewById(R.id.textViewError);
+        mHeightText = findViewById(R.id.textViewHeightO);
+        mHeightaccText = findViewById(R.id.textViewHeightaccO);
+        mDecraccText = findViewById(R.id.textViewDecraccO);
+        mTimeaccText = findViewById(R.id.textViewTimeaccO);
+        mStepText = findViewById(R.id.textViewStepO);
+        mCalibrateIn = findViewById(R.id.editTextHeightcal);
+        mStartButton = findViewById(R.id.buttonStart);
+        mStepDailyText = findViewById(R.id.textViewDailyStepsNum);
+        mHeightDailyText = findViewById(R.id.textViewDailyHeightNum);
+        mStepDailyProgress = findViewById(R.id.progressBarSteps);
         mStepDailyProgress.setMax(100);
-        mHeightDailyProgress = (ProgressBar)findViewById(R.id.progressBarHeight);
+        mHeightDailyProgress = findViewById(R.id.progressBarHeight);
         mHeightDailyProgress.setMax(100);
-        mFloatingButton = (FloatingActionButton) findViewById(R.id.fab);
+        mFloatingButton = findViewById(R.id.fab);
 
 
         // initialize start button
@@ -414,7 +413,7 @@ public class MainActivity extends AppCompatActivity {
             mHeightaccText.setText(String.format(Locale.getDefault(),"%.1f m",heightacc));
             Float decracc = receive.getFloatExtra("Decracc",0F);
             mDecraccText.setText(String.format(Locale.getDefault(),"%.1f m",decracc));
-            Long timeacc = (long)receive.getFloatExtra("Timeacc",0F);
+            long timeacc = (long)receive.getFloatExtra("Timeacc",0F);
             // mTimeaccText.setText(String.format(Locale.getDefault(),"%.1f s",timeacc));
             long hours = TimeUnit.SECONDS.toHours(timeacc);
             long minutes = TimeUnit.SECONDS.toMinutes(timeacc) -
