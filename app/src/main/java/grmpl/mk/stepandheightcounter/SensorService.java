@@ -860,7 +860,7 @@ public class SensorService extends Service {
                     //  drawback: last interval of day is saved at next day 0:00
                     //    solution: check in save-method for 0:00 and save it as 24:00
                     mSave.saveStatistics( (evtint + 1) * interval_msec,
-                            mStepsCumul[1],mHeightCumul[1], mDecrCumul[0], mTimeCumul[0],cSTAT_TYPE_REGULAR);
+                            mStepsCumul[1],mHeightCumul[1], mDecrCumul[1], mTimeCumul[1],cSTAT_TYPE_REGULAR);
                     mStepsCumul[1] = running;  // method can be called even if measurement is not running
                     mHeightCumul[1] = running; // so we have to save actual state
                     mDecrCumul[1] = running;
@@ -891,7 +891,7 @@ public class SensorService extends Service {
                     // as our days are UTC-days ( integer * 24h ), we have to correct the timestamps with timezone-information
                     //   timestamp for saving would be 0:00
                     mSave.saveStatistics( evtint * interval_msec - tz.getOffset(mEvtTimestampMilliSec),
-                            mStepsCumul[2],mHeightCumul[2], mDecrCumul[0], mTimeCumul[0],cSTAT_TYPE_DAILY);
+                            mStepsCumul[2],mHeightCumul[2], mDecrCumul[2], mTimeCumul[2],cSTAT_TYPE_DAILY);
                     mStepsCumul[2] = running;  //see above
                     mHeightCumul[2] = running; //see above
                     mDecrCumul[2] = running; //see above
