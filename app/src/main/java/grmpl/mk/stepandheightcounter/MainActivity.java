@@ -416,10 +416,13 @@ public class MainActivity extends AppCompatActivity {
             mDecraccText.setText(String.format(Locale.getDefault(),"%.1f m",decracc));
             Long timeacc = (long)receive.getFloatExtra("Timeacc",0F);
             // mTimeaccText.setText(String.format(Locale.getDefault(),"%.1f s",timeacc));
+            long hours = TimeUnit.SECONDS.toHours(timeacc);
+            long minutes = TimeUnit.SECONDS.toMinutes(timeacc) -
+                           TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(timeacc));
+            long seconds = TimeUnit.SECONDS.toSeconds(timeacc) -
+                           TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(timeacc));
             mTimeaccText.setText(String.format(Locale.getDefault(),"%02d:%02d:%02d",
-                    TimeUnit.SECONDS.toHours(timeacc),
-                    TimeUnit.SECONDS.toMinutes(timeacc),
-                    TimeUnit.SECONDS.toSeconds(timeacc)
+                    hours,minutes,seconds
             ));
             float stepstoday = receive.getFloatExtra("Stepstoday",0F);
             mStepDailyText.setText(String.format(Locale.getDefault(),"%.0f",stepstoday));

@@ -128,7 +128,7 @@ class SaveData {
         saveStatistics(timems, stepscumul, heightcumul, decrcumul, timecumul, height, type, true);
     }
 
-    void saveStatistics(long timems, float stepscumul, float heightcumul, float timecumul, float decrcumul, String type) {
+    void saveStatistics(long timems, float stepscumul, float heightcumul, float decrcumul, float timecumul, String type) {
         saveStatistics(timems, stepscumul, heightcumul, decrcumul, timecumul, -99997, type, false);
     }
 
