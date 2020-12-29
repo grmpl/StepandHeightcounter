@@ -7,8 +7,8 @@ android {
         applicationId "grmpl.mk.stepandheightcounter"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 6
-        versionName "1.22"
+        versionCode 10
+        versionName "1.50"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {

@@ -181,7 +181,9 @@ public class MainActivity extends AppCompatActivity {
         mStepDailyText = (TextView)findViewById(R.id.textViewDailyStepsNum);
         mHeightDailyText = (TextView)findViewById(R.id.textViewDailyHeightNum);
         mStepDailyProgress = (ProgressBar)findViewById(R.id.progressBarSteps);
+        mStepDailyProgress.setMax(100);
         mHeightDailyProgress = (ProgressBar)findViewById(R.id.progressBarHeight);
+        mHeightDailyProgress.setMax(100);
         mFloatingButton = (FloatingActionButton) findViewById(R.id.fab);
 
 
