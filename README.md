@@ -1,10 +1,10 @@
 # StepandHeightcounter
-This Android app counts steps and elevation gain. It should work on all devices with a step counter sensor and a pressure sensor.
+This Android app counts footsteps and elevation gain during walking. It should work on all devices with a step counter sensor and a pressure sensor.
 Since Android 10+ access permission to "Physical Activity" is necessary for step sensor. Thanks to duggalsu the app has been reworked and current release is now working again. I haven't tested, if reworked app is working on older devices. Please use release v1.21-fdroid if not.
 
 A pressure or barometric sensor is mandatory, steps will not be counted without pressure values. Please note: The step counter sensor is a special sensor which counts the steps by itself without additional software and is not to be mistaken with a step detector sensor.
 
-I've written the app, because I was interested in my elevation gain when I walk up the stairs instead of using the elevator. I couldn't find any app with this feature yet. (I haven't tried one of the big activity apps, because they are doing much more than I want.)
+I've written the app, because I was interested in my elevation gain when I use the stairs the whole day instead of using the elevator. I couldn't find a small app with just this feature. And it's useful when doing hiking in the mountains.
 
 Elevation gain is counted only when walking, so driving and elevators will not count.
 But riding a bycicle will give a step counting and therefore an elevation gain. I can't think of a way to stop this, so you have to pause measurement if you don't want it.
