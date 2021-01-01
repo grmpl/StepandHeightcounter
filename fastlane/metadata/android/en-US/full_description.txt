@@ -1,8 +1,8 @@
-This app counts steps and elevation gain if step sensor and barometric sensor is available. 
+This app counts footsteps and elevation gain if step sensor and barometric sensor is available. 
 All data is kept locally only, there is no connection to any server. For statistics you can save your data locally on SD-Card.
 
-Please note: Pressure sensor is mandatory. Steps will not be counted if there is a step sensor but no pressure sensor. 
-Elevation gain should only be counted if steps are detected, so only stairs will count, but not elevators. Don’t expect high accuracy - due to the concept of the sensors the accuracy is limited. And: avoid walking in trains or subways with active measurement, as the pressure (and therefore height) can change significantly during driving. 
+Please note: Pressure sensor is mandatory. Steps will not be counted during walking, if there is a step sensor but no pressure sensor. 
+Elevation gain should only be counted if footsteps are detected, so only stairs and hill climbing will count, but not elevators or lifts. Don’t expect high accuracy - due to the concept of the sensors the accuracy is limited. And: avoid walking in trains or subways with active measurement, as the pressure (and therefore height) can change significantly during driving. 
 
 You can save regular and daily statistics automatically on SD-Card and save current values with the floating action button. Starting with Android 10 files are not saved to root-folder of SD-card anymore, but in app-directory. There isn’t much on graphical display of statistic data besides two progress bars. Just use any program which can read csv-values. 
 
