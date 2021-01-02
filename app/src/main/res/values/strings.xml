@@ -28,8 +28,13 @@
     <string name="height_m">height [m]</string>
     <string name="height_init1">999 m</string>
     <string name="zero" translatable="false">0</string>
-    <string name="height_accumulated">Elevation gain</string>
+    <string name="height_accumulated">Ascending</string>
+    <string name="decr_accumulated">Descending</string>
+    <string name="heightdesc_accumulated">Elev. gain/loss</string>
+    <string name="time_accumulated">Time running</string>
     <string name="zero_m" translatable="false">0 m</string>
+    <string name="zerozero_m" translatable="false">0 / 0 m</string>
+    <string name="zero_s" translatable="false">00:00:00</string>
     <string name="no_data">No data</string>
     <string name="stop_service_notice">Disable notification.\nApp has to be restarted. \nAll unsaved data will be lost!</string>
     <string name="button_stop_service">Stop Service</string>
@@ -80,8 +85,8 @@
     <string name="pref_stat_detail_start">Start measurement</string>
     <string name="pref_stat_detail_steps">Every step sensor event</string>
     <string name="pref_stat_detail_stop">Stop measurement</string>
-    <string name="save_stat_headline_height">Time, timezone, steps, elevation gain, height, entry type\n</string>
-    <string name="save_stat_headline">"Time, timezone, steps, elevation gain, entry type "</string>
+    <string name="save_stat_headline_height">Time, timezone, steps, elevation gain, elevation decrease, time running, height, entry type\n</string>
+    <string name="save_stat_headline">"Time, timezone, steps, elevation gain, elevation decrease, time running, entry type "</string>
     <string name="stat_type_reset_before">Before reset</string>
     <string name="stat_type_calibration_before">Before calibration</string>
     <string name="stat_type_calibration_after">After calibration</string>

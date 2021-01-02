@@ -1,0 +1,3 @@
+- Runs on Android 10+ (since 1.22)
+- Added measurement of descending
+- Added stopwatch

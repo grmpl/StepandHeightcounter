@@ -38,6 +38,7 @@ import android.widget.Toast;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import grmpl.mk.stepandheightcounter.SensorService.LocalBinder;
 
@@ -46,7 +47,7 @@ import static grmpl.mk.stepandheightcounter.Constants.*;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView mStatusText, mHeightText, mStepText, mHeightaccText, mStepDailyText, mHeightDailyText;
+    private TextView mStatusText, mHeightText, mStepText, mHeightaccText, mDecraccText, mTimeaccText, mStepDailyText, mHeightDailyText;
     private EditText mCalibrateIn;
     private Button mStartButton;
     private FloatingActionButton mFloatingButton;
@@ -60,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
 
     // https://stackoverflow.com/questions/42941662/request-permissions-in-main-activity
     public static final int MULTIPLE_PERMISSIONS = 100;
+
+    // Todo: Permission check is a mess copied out of the internet and modified to the needs
+    //       Should be reworked to something nicer like this one: https://stackoverflow.com/questions/34342816/android-6-0-multiple-permissions
 
     private void checkPermission() {
         if (ContextCompat.checkSelfPermission(MainActivity.this,
@@ -96,20 +100,32 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(
             int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        boolean activityPermission=false;
+        boolean writeExternalFile=false;
+
         switch (requestCode) {
             case MULTIPLE_PERMISSIONS:
                 if (grantResults.length > 0) {
-                    boolean activityPermission = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                    boolean writeExternalFile = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    for (int i = 0; i < grantResults.length; i++) {
+                        switch (permissions[i]){
+                            case Manifest.permission.ACTIVITY_RECOGNITION:
+                                activityPermission = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+                                break;
+                            case Manifest.permission.WRITE_EXTERNAL_STORAGE:
+                                writeExternalFile = grantResults[i] == PackageManager.PERMISSION_GRANTED;
+                                break;
+                        }
 
-                    if(writeExternalFile) {
+                    }
+
+                    if(writeExternalFile) { // Permission on Android10+ not necessary, because of scoped storage
                         Toast.makeText(MainActivity.this, R.string.permission_sdcard_granted,
                                 Toast.LENGTH_SHORT).show();
                         SharedPreferences.Editor editpref =
                                 PreferenceManager.getDefaultSharedPreferences(this).edit();
                         editpref.putBoolean("mReqSDPermission", false);
                         editpref.apply();
-                    } else {
+                    } else if (Build.VERSION.SDK_INT <  Build.VERSION_CODES.Q) {
                         Toast.makeText(MainActivity.this, R.string.cant_write_sdcard,
                                 Toast.LENGTH_SHORT).show();
                     }
@@ -143,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Request permissions
@@ -153,17 +169,21 @@ public class MainActivity extends AppCompatActivity {
         mSettings = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Get all necessary elements
-        mStatusText = (TextView)findViewById(R.id.textViewError);
-        mHeightText = (TextView)findViewById(R.id.textViewHeightO);
-        mHeightaccText = (TextView)findViewById(R.id.textViewHeightaccO);
-        mStepText = (TextView)findViewById(R.id.textViewStepO);
-        mCalibrateIn = (EditText)findViewById(R.id.editTextHeightcal);
-        mStartButton = (Button)findViewById(R.id.buttonStart);
-        mStepDailyText = (TextView)findViewById(R.id.textViewDailyStepsNum);
-        mHeightDailyText = (TextView)findViewById(R.id.textViewDailyHeightNum);
-        mStepDailyProgress = (ProgressBar)findViewById(R.id.progressBarSteps);
-        mHeightDailyProgress = (ProgressBar)findViewById(R.id.progressBarHeight);
-        mFloatingButton = (FloatingActionButton) findViewById(R.id.fab);
+        mStatusText = findViewById(R.id.textViewError);
+        mHeightText = findViewById(R.id.textViewHeightO);
+        mHeightaccText = findViewById(R.id.textViewHeightaccO);
+        mDecraccText = findViewById(R.id.textViewDecraccO);
+        mTimeaccText = findViewById(R.id.textViewTimeaccO);
+        mStepText = findViewById(R.id.textViewStepO);
+        mCalibrateIn = findViewById(R.id.editTextHeightcal);
+        mStartButton = findViewById(R.id.buttonStart);
+        mStepDailyText = findViewById(R.id.textViewDailyStepsNum);
+        mHeightDailyText = findViewById(R.id.textViewDailyHeightNum);
+        mStepDailyProgress = findViewById(R.id.progressBarSteps);
+        mStepDailyProgress.setMax(100);
+        mHeightDailyProgress = findViewById(R.id.progressBarHeight);
+        mHeightDailyProgress.setMax(100);
+        mFloatingButton = findViewById(R.id.fab);
 
 
         // initialize start button
@@ -258,7 +278,8 @@ public class MainActivity extends AppCompatActivity {
                     if (mSensService != null) height = mSensService.getHeight();
                     else height = -9996;
                     mSave.saveStatistics(System.currentTimeMillis(), mSettings.getFloat("mStepsCumul0", 0),
-                            mSettings.getFloat("mHeightCumul0", 0), height, cSTAT_TYPE_MARK);
+                            mSettings.getFloat("mHeightCumul0", 0), mSettings.getFloat("mDecrCumul0", 0),
+                            mSettings.getFloat("mTimeCumul0", 0), height, cSTAT_TYPE_MARK);
                 }
             });
         }
@@ -321,6 +342,8 @@ public class MainActivity extends AppCompatActivity {
         mStepText.setText(R.string.zero);
         mHeightText.setText(R.string.height_init1);
         mHeightaccText.setText(R.string.zero_m);
+        mDecraccText.setText(R.string.zero_m);
+        mTimeaccText.setText(R.string.zero_s);
         mStatusText.setText("");
         mCalibrateIn.setText("");
         mCalibrateIn.setHint(R.string.height_m);
@@ -388,6 +411,18 @@ public class MainActivity extends AppCompatActivity {
             mHeightText.setText(String.format(Locale.getDefault(),"%.1f m",height));
             Float heightacc = receive.getFloatExtra("Heightacc",0F);
             mHeightaccText.setText(String.format(Locale.getDefault(),"%.1f m",heightacc));
+            Float decracc = receive.getFloatExtra("Decracc",0F);
+            mDecraccText.setText(String.format(Locale.getDefault(),"%.1f m",decracc));
+            long timeacc = (long)receive.getFloatExtra("Timeacc",0F);
+            // mTimeaccText.setText(String.format(Locale.getDefault(),"%.1f s",timeacc));
+            long hours = TimeUnit.SECONDS.toHours(timeacc);
+            long minutes = TimeUnit.SECONDS.toMinutes(timeacc) -
+                           TimeUnit.HOURS.toMinutes(TimeUnit.SECONDS.toHours(timeacc));
+            long seconds = TimeUnit.SECONDS.toSeconds(timeacc) -
+                           TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(timeacc));
+            mTimeaccText.setText(String.format(Locale.getDefault(),"%02d:%02d:%02d",
+                    hours,minutes,seconds
+            ));
             float stepstoday = receive.getFloatExtra("Stepstoday",0F);
             mStepDailyText.setText(String.format(Locale.getDefault(),"%.0f",stepstoday));
             // set progress bars
